@@ -89,6 +89,12 @@ if File.exist?(database_file)
 else
   warn("Please configure your config/database.yml first")
 end
+# deploy
+gem 'capistrano',         require: false
+gem 'capistrano3-puma',   require: false
+gem 'capistrano-bundler', require: false
+gem 'capistrano-rails',   require: false
+gem 'capistrano-rbenv',   require: false
 
 group :development, :test do
   gem 'debug'
@@ -106,7 +112,7 @@ group :test do
   gem 'simplecov', '~> 0.22.0', :require => false
   gem "ffi", platforms: [:mingw, :x64_mingw, :mswin]
   # For running system tests
-  gem 'puma'
+  gem 'puma', '~> 6.0'
   gem "capybara", ">= 3.39"
   gem 'selenium-webdriver', '>= 4.11.0'
   # RuboCop
