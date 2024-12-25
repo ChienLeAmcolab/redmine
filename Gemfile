@@ -89,12 +89,6 @@ if File.exist?(database_file)
 else
   warn("Please configure your config/database.yml first")
 end
-# deploy
-gem 'capistrano',         require: false
-gem 'capistrano3-puma',   require: false
-gem 'capistrano-bundler', require: false
-gem 'capistrano-rails',   require: false
-gem 'capistrano-rbenv',   require: false
 
 group :development, :test do
   gem 'debug'
@@ -104,6 +98,12 @@ group :development do
   gem 'listen', '~> 3.3'
   gem 'yard', require: false
   gem 'svg_sprite', require: false
+  # deploy
+  gem 'capistrano',         require: false
+  gem 'capistrano3-puma',   require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rails',   require: false
+  gem 'capistrano-rbenv',   require: false
 end
 
 group :test do
