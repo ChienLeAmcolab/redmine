@@ -100,7 +100,7 @@ group :development do
   gem 'svg_sprite', require: false
   # deploy
   gem 'capistrano',         require: false
-  gem 'capistrano3-puma', '6.0.0.beta.1',   require: false
+  gem 'capistrano3-puma',   require: false
   gem 'capistrano-bundler', require: false
   gem 'capistrano-rails',   require: false
   gem 'capistrano-rbenv',   require: false
