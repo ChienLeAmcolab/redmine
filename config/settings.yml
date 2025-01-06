@@ -20,7 +20,7 @@
 # Settings can be defined through the application in Admin -> Settings
 
 app_title:
-  default: Redmine
+  default: Amcolab Redmine
 welcome_text:
   default: |-
     Welcome to Redmine, an open-source, flexible project management software.
@@ -94,7 +94,7 @@ per_page_options:
 search_results_per_page:
   default: 10
 mail_from:
-  default: redmine@example.net
+  default: admin@amcolab.vn
 plain_text_mail:
   default: 0
 text_formatting:
@@ -110,9 +110,9 @@ force_default_language_for_anonymous:
 force_default_language_for_loggedin:
   default: 0
 host_name:
-  default: localhost:3000
+  default: redmine.amcolab.vn
 protocol:
-  default: http
+  default: https
   security_notifications: 1
 feeds_limit:
   format: int
