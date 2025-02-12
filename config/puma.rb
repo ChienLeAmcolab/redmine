@@ -1,15 +1,25 @@
 # config/puma.rb
-workers ENV.fetch("WEB_CONCURRENCY") { 2 }
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
-threads threads_count, threads_count
 
-port ENV.fetch("PORT") { 3000 }
-environment ENV.fetch("RAILS_ENV") { "production" }
+directory '/home/deploy/redmine'
+rackup "/home/deploy/redmine/config.ru"
+environment 'production'
+
+pidfile "/home/deploy/redmine/tmp/pids/puma.pid"
+state_path "/home/deploy/redmine/tmp/pids/puma.state"
+
+stdout_redirect '/home/deploy/redmine/log/puma.stdout.log', '/home/deploy/redmine/log/puma.stderr.log', true
+
+bind "tcp://0.0.0.0:3000"
+
+workers 2
+threads 1, 5
+
+preload_app!
 
 on_worker_boot do
-  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+  require "active_record"
+  ActiveRecord::Base.establish_connection
 end
 
-plugin :tmp_restart
 
 
