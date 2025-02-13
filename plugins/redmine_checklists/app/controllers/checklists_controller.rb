@@ -40,11 +40,15 @@ class ChecklistsController < ApplicationController
   end
 
   def destroy
+    @checklist_item = Checklist.find(params[:id])
     @checklist_item.destroy
     respond_to do |format|
-      format.api { render_api_ok }
+      format.html { redirect_back(fallback_location: issue_path(@checklist_item.issue), notice: "Checklist đã được xóa thành công.") }
+      format.js   # Tự động render destroy.js.erb
+      format.api  { render_api_ok }
     end
   end
+
 
   def create
     @checklist_item = Checklist.new
