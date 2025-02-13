@@ -21,8 +21,9 @@
 
 module ChecklistsHelper
 
-  def link_to_remove_checklist_fields(name, f, options={})
-    f.hidden_field(:_destroy) + link_to(name, "javascript:void(0)", options)
+  def link_to_remove_checklist_fields(f, name = nil, options = {}, &block)
+    f.hidden_field(:_destroy) +
+      (block_given? ? link_to("javascript:void(0)", options, &block) : link_to(name, "javascript:void(0)", options))
   end
 
   def new_object(f, association)
