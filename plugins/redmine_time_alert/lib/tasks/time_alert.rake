@@ -1,16 +1,17 @@
-namespace :redmine do
+require_dependency 'redmine_time_alert/patch/user_patch'
+namespace :redmine_time_alert do
   desc <<~DESC
-    Gửi email cảnh báo cho người dùng nếu tổng số giờ log của ngày hôm qua nhỏ hơn 8 giờ
-    và cài đặt cảnh báo đã được bật.
+    Send an email warning to users if the total logged hours yesterday is less than 8 hours
+    and the alert settings have been enabled.
     
-    Task này nên được lên lịch chạy vào lúc 8:00 sáng mỗi ngày để nhắc nhở người dùng.
+    This task should be scheduled to run at 8:00 am every day to remind users.
     
-    Các tùy chọn:
-      * dry_run - In danh sách người nhận ra console thay vì gửi email.
+    Options:
+      * dry_run - Print the list of users to the console instead of sending emails.
     
-    Ví dụ:
-      rake redmine:time_alert RAILS_ENV="production"
-      rake redmine:time_alert dry_run=1 RAILS_ENV="production"
+    For example:
+      rake redmine_time_alert:time_alert RAILS_ENV=production
+      rake redmine_time_alert:time_alert dry_run=1 RAILS_ENV=production
   DESC
   task time_alert: :environment do
     dry_run = ENV['dry_run']
