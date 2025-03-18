@@ -104,6 +104,8 @@ group :development do
   gem 'capistrano-bundler', require: false
   gem 'capistrano-rails',   require: false
   gem 'capistrano-rbenv',   require: false
+  gem 'pry'
+  gem 'letter_opener_web'
 end
 
 group :test do
