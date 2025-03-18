@@ -1,0 +1,15 @@
+<!-- redmine_time_alert/app/views/time_alert/_my_account_preferences.html.erb-->
+<fieldset class="box">
+  <legend><%= l(:label_time_alert_preferences, default: "Incomplete 8-Hour Work Log Warning Settings") %></legend>
+  <%= labelled_fields_for :pref, @user.pref do |pref_fields| %>
+    <p>
+      <%= pref_fields.check_box :time_alert_enabled, title: "Hiển thị cảnh báo nếu ngày hôm qua bạn chưa ghi nhận đủ 8 giờ làm việc." %>
+    </p>
+    <p>
+      <%= pref_fields.check_box :email_alert_enabled, title: "Gửi email nhắc nhở vào 8 giờ sáng hôm sau nếu bạn chưa ghi nhận đủ 8 giờ làm việc." %>
+    </p>
+  <% end %>
+</fieldset>
+
+
+

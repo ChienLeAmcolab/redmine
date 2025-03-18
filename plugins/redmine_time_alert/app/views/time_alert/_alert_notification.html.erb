@@ -1,0 +1,47 @@
+<style>
+    /* CSS cho thông báo time alert */
+    #time-alert {
+        position: relative;
+        padding: 15px 20px 15px 15px;
+        margin: 15px 0;
+        border: 1px solid #ebccd1;
+        border-radius: 4px;
+        background-color: #f2dede;
+        color: #a94442;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    #time-alert .close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #a94442;
+        cursor: pointer;
+        outline: none;
+    }
+    #time-alert .close:hover {
+        color: #843534;
+    }
+</style>
+<% if User.current.logged? && User.current.need_time_alert? %>
+  <div id="time-alert" class="time-alert">
+    <button type="button" class="close" aria-label="Close">&times;</button>
+    <p>
+      <%= l(:notice_time_alert,
+            hours: User.current.time_logged_last_working_day,
+            default: "Hôm qua bạn chỉ log được #{User.current.time_logged_last_working_day} giờ. Vui lòng log đủ 8 giờ!") %>
+    </p>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        console.log("Time alert loaded");
+        $('#time-alert .close').click(function(){
+            $('#time-alert').fadeOut(300);
+        });
+    });
+</script>
