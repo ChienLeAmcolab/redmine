@@ -31,4 +31,8 @@ module RedmineTimeAlert
   end
 end
 
-User.prepend RedmineTimeAlert::UserPatch
+Rails.application.config.to_prepare do
+  unless User.singleton_class.included_modules.include?(RedmineTimeAlert::UserPatch)
+    User.singleton_class.prepend(RedmineTimeAlert::UserPatch)
+  end
+end
