@@ -1,4 +1,4 @@
-require_dependency 'redmine_time_alert/patches/user_patch'
+require_dependency 'redmine_time_alert/lib/patches/user_patch'
 namespace :redmine_time_alert do
   desc <<~DESC
     Send an email warning to users if the total logged hours yesterday is less than 8 hours
