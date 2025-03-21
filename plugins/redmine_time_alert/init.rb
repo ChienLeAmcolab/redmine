@@ -9,9 +9,6 @@ app_path  = File.join(plugin_root, 'app')
 
 $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
-# Load file patches và mailer
-require_dependency 'lib/patches/user_preference_patch'
-require_dependency 'lib/patches/user_patch'
 # require_dependency File.join(plugin_root, 'app', 'mailers', 'time_alert_mailer')
 require_dependency File.join(plugin_root, 'lib', 'patches', 'account_controller_patch')
 require_dependency File.join(plugin_root, 'lib', 'patches', 'user_patch')
