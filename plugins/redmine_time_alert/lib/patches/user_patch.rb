@@ -30,7 +30,3 @@ module RedmineTimeAlert
     end
   end
 end
-
-unless User.included_modules.include?(RedmineTimeAlert::UserPatch)
-  User.send(:include, RedmineTimeAlert::UserPatch)
-end
