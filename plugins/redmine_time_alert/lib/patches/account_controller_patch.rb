@@ -1,6 +1,6 @@
 module RedmineTimeAlert
   module AccountControllerPatch
-    def self.included(base)
+    def self.prepended(base)
       base.class_eval do
         before_action :permit_time_alert_attributes, only: [:update]
 
@@ -13,8 +13,4 @@ module RedmineTimeAlert
       end
     end
   end
-end
-
-unless AccountController.included_modules.include?(RedmineTimeAlert::AccountControllerPatch)
-  AccountController.send(:include, RedmineTimeAlert::AccountControllerPatch)
 end
