@@ -1,0 +1,2 @@
+class TimeAlertSetting < ApplicationMailer
+end
