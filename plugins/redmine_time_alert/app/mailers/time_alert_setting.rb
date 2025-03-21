@@ -1,2 +1,2 @@
-class TimeAlertSetting < ApplicationMailer
+class TimeAlertSetting < ActionMailer::Base
 end
