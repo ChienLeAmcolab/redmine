@@ -37,6 +37,4 @@ module RedmineTimeAlert
   end
 end
 
-unless UserPreference.included_modules.include?(RedmineTimeAlert::UserPreferencePatch)
-  UserPreference.include(RedmineTimeAlert::UserPreferencePatch)
-end
+UserPreference.prepend RedmineTimeAlert::UserPreferencePatch
