@@ -1,4 +1,5 @@
-require_dependency 'redmine_time_alert/patch/user_patch'
+plugin_root = File.expand_path("../../../", __FILE__)
+require_dependency File.join(plugin_root, 'lib', 'patches', 'user_patch')
 namespace :redmine_time_alert do
   desc <<~DESC
     Send an email warning to users if the total logged hours yesterday is less than 8 hours

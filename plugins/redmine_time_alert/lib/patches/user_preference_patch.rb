@@ -1,6 +1,6 @@
 module RedmineTimeAlert
   module UserPreferencePatch
-    def self.included(base)
+    def self.prepended(base)
       base.class_eval do
         # Declare the attributes that can be set safely
         safe_attributes :time_alert_enabled, :email_alert_enabled
@@ -37,6 +37,4 @@ module RedmineTimeAlert
   end
 end
 
-unless UserPreference.included_modules.include?(RedmineTimeAlert::UserPreferencePatch)
-  UserPreference.include(RedmineTimeAlert::UserPreferencePatch)
-end
+UserPreference.prepend RedmineTimeAlert::UserPreferencePatch

@@ -1,6 +1,6 @@
 module RedmineTimeAlert
   module UserPatch
-    def self.included(base)
+    def self.prepended(base)
       base.class_eval do
        # Calculate the last working day to check the number of hours log:
        # - If today is Sunday or Monday, returns to the Friday of last week.
@@ -31,6 +31,4 @@ module RedmineTimeAlert
   end
 end
 
-unless User.included_modules.include?(RedmineTimeAlert::UserPatch)
-  User.send(:include, RedmineTimeAlert::UserPatch)
-end
+User.prepend RedmineTimeAlert::UserPatch
