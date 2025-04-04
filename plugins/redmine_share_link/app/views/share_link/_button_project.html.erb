@@ -1,0 +1,46 @@
+<% project = local_assigns[:project] || (defined?(@project) ? @project : nil) %>
+<% if project %>
+  <% share_token = SharedHelper.generate_project_token(project) %>
+  <% share_url = "#{Setting.host_name}/share/project/#{project.identifier}?token=#{share_token}" %>
+
+  <button id="copy-share-project-<%= project.id %>" class="share-link-button"
+          data-share-url="<%= share_url %>">
+    🔗 Chia sẻ Dự Án & Copy Link
+  </button>
+<% end %>
+<style>
+    .share-link-button {
+        cursor: pointer;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.share-link-button').on('click', function(e) {
+            e.preventDefault();
+            var url = $(this).data('share-url');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url)
+                    .then(function() {
+                        alert('Đã sao chép link chia sẻ vào clipboard: ' + url);
+                    })
+                    .catch(function(err) {
+                        console.error('Clipboard copy failed', err);
+                        alert('Không thể copy tự động. Bạn hãy copy thủ công: ' + url);
+                    });
+            } else {
+                // Fallback nếu trình duyệt không hỗ trợ Clipboard API
+                var $tempInput = $('<input>');
+                $('body').append($tempInput);
+                $tempInput.val(url).select();
+                try {
+                    document.execCommand('copy');
+                    alert('Đã sao chép link chia sẻ vào clipboard: ' + url);
+                } catch (e) {
+                    alert('Link chia sẻ: ' + url);
+                }
+                $tempInput.remove();
+            }
+        });
+    });
+</script>
