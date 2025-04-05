@@ -1,0 +1,15 @@
+<% content_for :header_tags do %>
+  <meta property="og:title" content="Dự án <%= @project.name %>" />
+  <meta property="og:description" content="<%= truncate(strip_tags(@project.description), length: 150) %>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="<%= Setting.host_name %>/projects/<%= @project.identifier %>" />
+<% end %>
+
+<div class="share-public-content">
+  <h2><%= h(@project.name) %></h2>
+  <p><%= simple_format(truncate(@project.description, length: 300)) %></p>
+  <% if @project.homepage.present? %>
+    <p><strong>Homepage:</strong> <%= link_to @project.homepage, @project.homepage %></p>
+  <% end %>
+  <p><em>(Trang chia sẻ thông tin dự án công khai)</em></p>
+</div>
