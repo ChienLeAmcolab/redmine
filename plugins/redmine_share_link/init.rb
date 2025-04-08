@@ -15,3 +15,4 @@ if (Rails.configuration.respond_to?(:autoloader) && Rails.configuration.autoload
 end
 require File.dirname(__FILE__) + '/lib/share_link_hook'
 require File.dirname(__FILE__) + '/lib/views_layouts_hook'
+require File.dirname(__FILE__) + '/lib/html_title_patch'
