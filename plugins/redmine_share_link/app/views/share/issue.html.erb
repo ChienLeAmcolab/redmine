@@ -1,4 +1,5 @@
 <% content_for :header_tags do %>
+  <title><%= @issue.subject %> - <%= @issue.project.name %> - AMCOLAB Project Manager</title>
   <meta property="og:title" content="Issue <%= @issue.subject %> - Dự án <%= @issue.project.name %>" />
   <meta property="og:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>" />
   <meta property="og:type" content="article" />
