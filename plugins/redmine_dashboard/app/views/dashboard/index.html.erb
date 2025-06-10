@@ -1,0 +1,8 @@
+<%# encoding: utf-8 %>
+<h2><%= l(:label_dashboard) %></h2>
+<%= content_tag(:iframe, nil,
+                src: @dashboard_url,
+                width: '100%',
+                height: '800px',
+                frameborder: '0',
+                allowfullscreen: true) %>

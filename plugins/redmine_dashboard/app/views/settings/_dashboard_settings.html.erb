@@ -1,0 +1,10 @@
+<%# app/views/settings/_dashboard_settings.html.erb %>
+<fieldset class="box settings">
+  <legend><%= l(:label_dashboard_settings) %></legend>
+  <p><%= l(:help_dashboard_url) %></p>
+  <p>
+    <%= text_field_tag 'settings[default_url]',
+                       Setting.plugin_redmine_dashboard['default_url'], size: 80 %>
+  </p>
+  <p><em><%= l(:note_project_custom_field) %></em></p>
+</fieldset>
