@@ -1,0 +1,9 @@
+en:
+  label_dashboard: "Dashboard"
+  label_dashboard_settings: "Dashboard Settings"
+  help_dashboard_url: "Default URL to embed globally."
+  help_dashboard_url_project: "Enter a project-specific Dashboard URL (overrides global default)."
+  field_dashboard_url: "Dashboard URL"
+  error_dashboard_url_not_set: "Dashboard URL is not set. Configure it globally or per project."
+  note_project_custom_field: "Alternatively, set a Custom Field named 'Dashboard URL' on the project."
+  notice_successful_update: "Dashboard settings were successfully updated."
