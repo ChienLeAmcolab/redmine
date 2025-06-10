@@ -1,0 +1,9 @@
+vi:
+  label_dashboard: "Bảng điều khiển"
+  label_dashboard_settings: "Cài đặt Dashboard"
+  help_dashboard_url: "URL nhúng mặc định toàn cục."
+  help_dashboard_url_project: "Nhập URL Dashboard riêng cho dự án (ghi đè mặc định)."
+  field_dashboard_url: "URL Dashboard"
+  error_dashboard_url_not_set: "Chưa cấu hình URL Dashboard. Vui lòng cấu hình toàn cục hoặc từng dự án."
+  note_project_custom_field: "Hoặc cấu hình Custom Field tên 'Dashboard URL' cho dự án."
+  notice_successful_update: "Cập nhật cài đặt Dashboard thành công."

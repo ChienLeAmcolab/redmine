@@ -1,0 +1,12 @@
+<%# app/views/project_dashboard_settings/edit.html.erb %>
+<h2><%= l(:label_dashboard_settings) %></h2>
+<%= form_with url: project_dashboard_settings_path(@project), method: :put, local: true do |f| %>
+  <p>
+    <%= f.label :dashboard_url, l(:field_dashboard_url) %><br />
+    <%= f.text_field :dashboard_url,
+                     value: (@project_url.presence || @global_default),
+                     size: 80 %>
+  </p>
+  <p class="info"><%= l(:help_dashboard_url_project) %></p>
+  <%= f.submit l(:button_save) %>
+<% end %>
