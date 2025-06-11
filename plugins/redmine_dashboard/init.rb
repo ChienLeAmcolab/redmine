@@ -46,13 +46,13 @@ Redmine::MenuManager.map :project_settings_menu do |menu|
             after: :repositories,
             if:    Proc.new { |project| User.current.allowed_to?(:configure_project_dashboard, project) }
 end
-Redmine::MenuManager.map :application_menu do |menu|
-  menu.push :global_dashboard,
-            { controller: 'dashboard', action: 'global' },
-            caption: Proc.new { I18n.t(:label_dashboard) },
-            after:   :projects,
-            if:      Proc.new { |project|
-              project.nil? &&
-                User.current.allowed_to?(:view_dashboard, nil, global: true)
-            }
-end
+# Redmine::MenuManager.map :application_menu do |menu|
+#   menu.push :global_dashboard,
+#             { controller: 'dashboard', action: 'global' },
+#             caption: Proc.new { I18n.t(:label_dashboard) },
+#             after:   :projects,
+#             if:      Proc.new { |project|
+#               project.nil? &&
+#                 User.current.allowed_to?(:view_dashboard, nil, global: true)
+#             }
+# end
