@@ -28,14 +28,14 @@ Redmine::Plugin.register :redmine_dashboard do
 end
 
 # Add Dashboard tab in project menu
-Redmine::MenuManager.map :project_menu do |menu|
-  menu.push :dashboard,
-            { controller: 'dashboard', action: 'index' },
-            param: :project_id,
-            caption: Proc.new { I18n.t(:label_dashboard) },
-            after: :activity,
-            if:    Proc.new { |project| User.current.allowed_to?(:view_dashboard, project) }
-end
+# Redmine::MenuManager.map :project_menu do |menu|
+#   menu.push :dashboard,
+#             { controller: 'dashboard', action: 'index' },
+#             param: :project_id,
+#             caption: Proc.new { I18n.t(:label_dashboard) },
+#             after: :activity,
+#             if:    Proc.new { |project| User.current.allowed_to?(:view_dashboard, project) }
+# end
 
 # Add Dashboard Settings tab in project settings menu
 Redmine::MenuManager.map :project_settings_menu do |menu|
