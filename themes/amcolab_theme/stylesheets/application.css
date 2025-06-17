@@ -1,0 +1,21 @@
+/* load CSS Redmine Origin*/
+@import url("../../application.css");
+
+/* Change background color and text for header */
+#header {
+    background: #1699A1;
+}
+
+#header h1 a,
+#header h1 a:hover {
+    color: #ecf0f1 ;
+}
+
+/* Change background color and text for footer */
+#footer {
+    background: #1699A1;
+}
+#footer,
+#footer a {
+    color: black;
+}
