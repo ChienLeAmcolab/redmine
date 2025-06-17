@@ -28,7 +28,6 @@
 /public/assets/*
 /public/dispatch.*
 /public/plugin_assets/*
-/themes/*
 !/themes/README
 /tmp/*
 /tmp/cache/*
