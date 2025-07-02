@@ -5,13 +5,71 @@
 
   <button id="copy-share-project-<%= project.id %>" class="share-link-button"
           data-share-url="<%= share_url %>">
-    🔗 Chia sẻ Dự Án & Copy Link
+    🔗 Share this Project on social networks
   </button>
 <% end %>
 <style>
     .share-link-button {
+        border: none;
+        border-radius: 0.5rem;
+        color: #fff;
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        background-size: 400% 400%;
+        animation: gradientBG 8s ease infinite, glow 8s ease infinite;
     }
+
+    /* Animation đổi gradient */
+    @keyframes gradientBG {
+        0%   { background-position: 0%   50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0%   50%; }
+    }
+
+    /* Animation hiệu ứng glow */
+    @keyframes glow {
+        0%,100% {
+            box-shadow: 0 0 10px rgba( 38,121,243,0.6);
+        }
+        25% {
+            box-shadow: 0 0 20px rgba(106,17,203,0.8);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(37,117,252,1);
+        }
+        75% {
+            box-shadow: 0 0 20px rgba(106,17,203,0.8);
+        }
+    }
+
+    /* Hiệu ứng ánh sáng mờ tỏa ra */
+    .share-link-button::after {
+        content: "";
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.3), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    .share-link-button:hover::after {
+        opacity: 1;
+        animation: glowLight 8s ease infinite;
+    }
+
+    /* Animation ánh sáng mờ */
+    @keyframes glowLight {
+        0%,100% {
+            opacity: 0.3;
+        }
+        50% {
+            opacity: 0.6;
+        }
+    }
+
 </style>
 <script type="text/javascript">
     $(document).ready(function() {
