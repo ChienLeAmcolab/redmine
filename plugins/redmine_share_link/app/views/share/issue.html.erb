@@ -28,7 +28,7 @@
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "<%= j @issue.subject %>",
-      "description": "<%= j truncate(strip_tags(@issue.description), 150) %>",
+      "description": "<%= j truncate(strip_tags(@issue.description), length: 150) %>",
       "url": "<%= Setting.host_name %>/issues/<%= @issue.id %>",
       "image": "<%= "#{Setting.host_name}/logo.png" %>",
       "author": { "@type": "Person", "name": "<%= @issue.author.name %>" },
