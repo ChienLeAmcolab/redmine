@@ -10,7 +10,7 @@
   <meta property="og:url"         content="<%= Setting.host_name %>/issues/<%= @issue.id %>" />
   <meta property="og:site_name"   content="DONA" />
   <meta property="og:locale"      content="vi_VN" />
-  <meta property="og:image"       content="<%= "/logo.png" %>" />
+  <meta property="og:image"       content="<%= Setting.host_name %>/logo.png" />
   <meta property="og:image:alt"   content="Dona Logo" />
 
   <!-- Twitter Card – X/Twitter -->
@@ -19,7 +19,7 @@
   <meta name="twitter:creator"     content="@AuthorHandle" />
   <meta name="twitter:title"       content="<%= @issue.subject %> – <%= @issue.project.name %>" />
   <meta name="twitter:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>" />
-  <meta name="twitter:image"       content="<%= "/logo.png" %>" />
+  <meta name="twitter:image"       content="<%= Setting.host_name %>/logo.png" />
   <meta name="twitter:image:alt"   content="Dona Logo" />
 
   <!-- Structured data JSON-LD – SEO & Pinterest -->
@@ -30,7 +30,7 @@
       "headline": "<%= j @issue.subject %>",
       "description": "<%= j truncate(strip_tags(@issue.description), length: 150) %>",
       "url": "<%= Setting.host_name %>/issues/<%= @issue.id %>",
-      "image": "<%= "/logo.png" %>",
+      "image": "<%= Setting.host_name %>/logo.png",
       "author": { "@type": "Person", "name": "<%= @issue.author.name %>" },
       "publisher": { "@type": "Organization", "name": "Amcolab Dona" }
     }
