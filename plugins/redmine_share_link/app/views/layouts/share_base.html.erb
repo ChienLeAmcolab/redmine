@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <!-- Tiêu đề tùy chỉnh chỉ cho trang chia sẻ -->
+  <!-- Các meta, favicon, stylesheet/js cần thiết -->
+  <%= csrf_meta_tags %>
+  <%= favicon %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
+
+  <!-- Chèn thẳng partial head_meta chứa OG/Twitter JSON-LD -->
+  <%= render partial: 'share_link/head_meta',
+             locals: { issue: @issue, project: @project, params: params } %>
+</head>
+<body>
+<%= yield %>
+</body>
+</html>

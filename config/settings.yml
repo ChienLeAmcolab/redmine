@@ -20,7 +20,7 @@
 # Settings can be defined through the application in Admin -> Settings
 
 app_title:
-  default: Amcolab Redmine
+  default: Amcolab Dona
 welcome_text:
   default: |-
     Welcome to Redmine, an open-source, flexible project management software.

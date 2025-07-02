@@ -1,0 +1,74 @@
+<%# app/views/share_link/_head_meta.html.erb %>
+
+<%#--- Title chung, chỉ 1 lần --- %>
+<title>
+  <% if defined?(@issue) && @issue.present? %>
+    <%= @issue.subject %> – <%= @issue.project.name %> | AMCOLAB DONA
+  <% else %>
+    <%= @project.name %> | AMCOLAB DONA
+  <% end %>
+</title>
+
+<%#--- Favicon --- %>
+<link rel="shortcut icon" href="<%= image_path('favicon.ico') %>" type="image/x-icon"/>
+<link rel="icon"          href="<%= image_path('favicon.ico') %>" type="image/x-icon"/>
+
+<%#--- Open Graph / Facebook, LinkedIn, Slack --- %>
+<meta property="og:type"        content="article"/>
+<meta property="og:site_name"   content="DONA"/>
+<meta property="og:locale"      content="vi_VN"/>
+
+<% if defined?(@issue) && @issue.present? %>
+  <meta property="og:title"       content="<%= @issue.subject %> – <%= @issue.project.name %>"/>
+  <meta property="og:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>"/>
+  <meta property="og:url"         content="<%= "#{Setting.host_name}/issues/#{@issue.id}?token=#{params[:token]}" %>"/>
+<% else %>
+  <meta property="og:title"       content="Dự án: <%= @project.name %>"/>
+  <meta property="og:description" content="<%= truncate(strip_tags(@project.description.to_s), length: 150) %>"/>
+  <meta property="og:url"         content="<%= "#{Setting.host_name}/projects/#{@project.identifier}?token=#{params[:token]}" %>"/>
+<% end %>
+
+<meta property="og:image"       content="https://dona.amcolab.vn/logo.png"/>
+<meta property="og:image:alt"   content="Dona Logo"/>
+
+<%#--- Twitter Card --- %>
+<meta name="twitter:card"        content="summary_large_image"/>
+<meta name="twitter:site"        content="@YourSiteHandle"/>
+<meta name="twitter:creator"     content="@AuthorHandle"/>
+<% if defined?(@issue) && @issue.present? %>
+  <meta name="twitter:title"       content="<%= @issue.subject %> – <%= @issue.project.name %>"/>
+  <meta name="twitter:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>"/>
+<% else %>
+  <meta name="twitter:title"       content="Dự án: <%= @project.name %>"/>
+  <meta name="twitter:description" content="<%= truncate(strip_tags(@project.description.to_s), length: 150) %>"/>
+<% end %>
+<meta name="twitter:image"       content="https://dona.amcolab.vn/logo.png"/>
+<meta name="twitter:image:alt"   content="Dona Logo"/>
+
+<%#--- Structured Data (JSON-LD) --- %>
+<script type="application/ld+json">
+  <%= {
+        "@context":    "https://schema.org",
+        "@type":       "Article",
+        "headline":    (defined?(@issue) && @issue.present? ? @issue.subject : @project.name),
+        "description": (defined?(@issue) && @issue.present? ?
+                          truncate(strip_tags(@issue.description), length: 150) :
+                          truncate(strip_tags(@project.description.to_s), length: 150)),
+        "url":         (defined?(@issue) && @issue.present? ?
+                          "#{Setting.host_name}/issues/#{@issue.id}?token=#{params[:token]}" :
+                          "#{Setting.host_name}/projects/#{@project.identifier}?token=#{params[:token]}"),
+        "image":       "https://dona.amcolab.vn/logo.png",
+        "author":      { "@type": "Person", "name": (defined?(@issue) && @issue.present? ? @issue.author.name : "") },
+        "publisher":   { "@type": "Organization", "name": "Amcolab Dona" }
+      }.to_json.html_safe %>
+</script>
+
+<%#--- SEO cơ bản --- %>
+<link rel="canonical"
+      href="<%= defined?(@issue) && @issue.present? ?
+                  "#{Setting.host_name}/issues/#{@issue.id}?token=#{params[:token]}" :
+                  "#{Setting.host_name}/projects/#{@project.identifier}?token=#{params[:token]}" %>"/>
+<meta name="description"
+      content="<%= defined?(@issue) && @issue.present? ?
+                     truncate(strip_tags(@issue.description), length: 155) :
+                     truncate(strip_tags(@project.description.to_s), length: 155) %>"/>
