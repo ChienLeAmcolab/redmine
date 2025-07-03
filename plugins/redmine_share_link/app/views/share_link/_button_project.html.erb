@@ -1,8 +1,7 @@
 <% project = local_assigns[:project] || (defined?(@project) ? @project : nil) %>
 <% if project %>
   <% share_token = SharedHelper.generate_project_token(project) %>
-  <% share_url = "#{Setting.host_name}/share/project/#{project.identifier}?token=#{share_token}" %>
-
+  <% share_url = "https://dona.amcolab.vn/share/project/#{project.identifier}?token=#{share_token}" %>
   <button id="copy-share-project-<%= project.id %>" class="share-link-button"
           data-share-url="<%= share_url %>">
     🔗 Share this Project on social networks
