@@ -6,11 +6,11 @@
 
 <%#--- Tạo share_url dùng cho og:url và canonical --- %>
 <% share_url = if is_issue
-                 "#{Setting.host_name}/share/issue/#{@issue.id}?token=#{params[:token]}"
+                 "https://dona.amcolab.vn/share/issue/#{@issue.id}?token=#{params[:token]}"
                elsif is_project
-                 "#{Setting.host_name}/share/project/#{@project.identifier}?token=#{params[:token]}"
+                 "https://dona.amcolab.vn/share/project/#{@project.identifier}?token=#{params[:token]}"
                else
-                 Setting.host_name
+                 "https://dona.amcolab.vn"
                end %>
 
 <%#--- 1. Title duy nhất --- %>
