@@ -1,10 +1,3 @@
-<% content_for :header_tags do %>
-  <meta property="og:title" content="Issue <%= @issue.subject %> - Dự án <%= @issue.project.name %>" />
-  <meta property="og:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>" />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="<%= Setting.host_name %>/issues/<%= @issue.id %>" />
-<% end %>
-
 <div class="share-public-content">
   <h2><%= h(@issue.subject) %> (<%= h(@issue.project.name) %>)</h2>
   <p><%= simple_format(truncate(@issue.description, length: 300)) %></p>

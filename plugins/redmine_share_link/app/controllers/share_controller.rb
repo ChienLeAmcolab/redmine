@@ -1,5 +1,6 @@
 # plugins/redmine_share_link/app/controllers/share_controller.rb
 class ShareController < ApplicationController
+  layout 'share_base'
   skip_before_action :check_if_login_required, :authorize, raise: false, only: [:issue, :project]
   # 'raise: false' để tránh lỗi nếu filter không định nghĩa trực tiếp&#8203;:contentReference[oaicite:2]{index=2}
 
@@ -32,7 +33,7 @@ class ShareController < ApplicationController
 
     # Người dùng chưa đăng nhập nhưng token đúng => hiển thị trang chia sẻ công khai
     @project = @issue.project  # đặt project hiện tại để view có ngữ cảnh
-    render 'share/issue', layout: 'base'  # dùng layout Redmine chuẩn
+    render 'share/issue'  # dùng layout Redmine chuẩn
   end
 
   def project
@@ -58,6 +59,6 @@ class ShareController < ApplicationController
     end
 
     # Với project, nếu token hợp lệ và user chưa login, hiển thị trang chia sẻ
-    render 'share/project', layout: 'base'
+    render 'share/project'
   end
 end

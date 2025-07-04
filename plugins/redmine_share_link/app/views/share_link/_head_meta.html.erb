@@ -1,0 +1,122 @@
+<%# app/views/share_link/_head_meta.html.erb %>
+
+<%#--- Xác định xem share Issue hay Project --- %>
+<% is_issue = defined?(@issue) && @issue.present? %>
+<% is_project = defined?(@project) && @project.present? %>
+
+<%#--- Tạo share_url dùng cho og:url và canonical --- %>
+<% share_url = if is_issue
+                 "https://dona.amcolab.vn/share/issue/#{@issue.id}?token=#{params[:token]}"
+               elsif is_project
+                 "https://dona.amcolab.vn/share/project/#{@project.identifier}?token=#{params[:token]}"
+               else
+                 "https://dona.amcolab.vn"
+               end %>
+
+<%#--- 1. Title duy nhất --- %>
+<title>
+  <% if is_issue %>
+    <%= @issue.subject %> – <%= @issue.project.name %> | AMCOLAB DONA
+  <% elsif is_project %>
+    Dự án: <%= @project.name %> | AMCOLAB DONA
+  <% else %>
+    AMCOLAB DONA
+  <% end %>
+</title>
+
+<%#--- 2. Favicon --- %>
+<link rel="shortcut icon" href="<%= image_path('favicon.ico') %>" type="image/x-icon"/>
+<link rel="icon" href="<%= image_path('favicon.ico') %>" type="image/x-icon"/>
+
+<%#--- 3. Open Graph (Facebook, LinkedIn, Slack…) --- %>
+<meta property="og:type" content="article"/>
+<meta property="og:site_name" content="DONA"/>
+<meta property="og:locale" content="vi_VN"/>
+<meta property="og:url" content="<%= share_url %>"/>
+
+<% if is_issue %>
+  <meta property="og:title" content="<%= @issue.subject %> – <%= @issue.project.name %>"/>
+  <meta property="og:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>"/>
+<% elsif is_project %>
+  <meta property="og:title" content="Dự án: <%= @project.name %>"/>
+  <meta property="og:description" content="<%= truncate(strip_tags(@project.description.to_s), length: 150) %>"/>
+<% end %>
+
+<meta property="og:image" content="https://dona.amcolab.vn/logo.png"/>
+<meta property="og:image:alt" content="Dona Logo"/>
+
+<%#--- 4. Twitter Card --- %>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@YourSiteHandle"/>
+<meta name="twitter:creator" content="@AuthorHandle"/>
+<meta name="twitter:url" content="<%= share_url %>"/>
+
+<% if is_issue %>
+  <meta name="twitter:title" content="<%= @issue.subject %> – <%= @issue.project.name %>"/>
+  <meta name="twitter:description" content="<%= truncate(strip_tags(@issue.description), length: 150) %>"/>
+<% elsif is_project %>
+  <meta name="twitter:title" content="Dự án: <%= @project.name %>"/>
+  <meta name="twitter:description" content="<%= truncate(strip_tags(@project.description.to_s), length: 150) %>"/>
+<% end %>
+
+<meta name="twitter:image" content="https://dona.amcolab.vn/logo.png"/>
+<meta name="twitter:image:alt" content="Dona Logo"/>
+
+<%#--- 5. JSON-LD Structured Data --- %>
+<%#--- 5. JSON-LD Structured Data (dùng if để gán từng trường) --- %>
+<script type="application/ld+json">
+  <%
+    ld = {
+      "@context"  => "https://schema.org",
+      "@type"     => "Article",
+      "image"     => "https://dona.amcolab.vn/logo.png",
+      "publisher" => {
+        "@type" => "Organization",
+        "name"  => "Amcolab Dona"
+      }
+    }
+
+    if is_issue
+      ld["headline"]    = @issue.subject
+      ld["description"] = truncate(strip_tags(@issue.description), length: 150)
+      ld["url"]         = share_url
+      ld["author"]      = {
+        "@type" => "Person",
+        "name"  => @issue.author.name
+      }
+    elsif is_project
+      ld["headline"]    = @project.name
+      ld["description"] = truncate(strip_tags(@project.description.to_s), length: 150)
+      ld["url"]         = share_url
+      ld["author"]      = {
+        "@type" => "Person",
+        "name"  => ""
+      }
+    else
+      # fallback nếu chẳng có issue hay project
+      ld["headline"]    = Setting.app_title
+      ld["description"] = Setting.app_title
+      ld["url"]         = Setting.host_name
+      ld["author"]      = {
+        "@type" => "Person",
+        "name"  => ""
+      }
+    end
+  %>
+  <%= ld.to_json.html_safe %>
+</script>
+
+<%#--- 6. SEO cơ bản: canonical và description (dùng if riêng) --- %>
+<% if is_issue %>
+  <link rel="canonical" href="<%= share_url %>"/>
+  <meta name="description"
+        content="<%= truncate(strip_tags(@issue.description), length: 155) %>"/>
+<% elsif is_project %>
+  <link rel="canonical" href="<%= share_url %>"/>
+  <meta name="description"
+        content="<%= truncate(strip_tags(@project.description.to_s), length: 155) %>"/>
+<% else %>
+  <link rel="canonical" href="<%= Setting.host_name %>"/>
+  <meta name="description"
+        content="<%= Setting.app_title %>"/>
+<% end %>
