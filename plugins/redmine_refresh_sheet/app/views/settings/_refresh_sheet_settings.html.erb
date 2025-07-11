@@ -1,0 +1,15 @@
+<!-- plugins/redmine_refresh_sheet/app/views/settings/_refresh_sheet_settings.html.erb -->
+<fieldset class="box">
+  <legend><%= t('redmine_refresh_sheet.settings.title', default: 'Refresh Sheet Settings') %></legend>
+
+  <table>
+    <tr>
+      <th>
+        <%= label_tag 'settings[script_url]', t('redmine_refresh_sheet.settings.script_url', default: 'Google Script URL') %>
+      </th>
+      <td>
+        <%= text_field_tag 'settings[script_url]', settings['script_url'], size: 80 %>
+      </td>
+    </tr>
+  </table>
+</fieldset>
