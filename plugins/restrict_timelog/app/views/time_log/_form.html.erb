@@ -1,0 +1,73 @@
+<!-- plugins/restrict_timelog/app/views/timelog/_form.html.erb -->
+<%= error_messages_for 'time_entry' %>
+<%= back_url_hidden_field_tag %>
+
+<div class="box tabular">
+  <!-- giữ nguyên các field project/user/issue -->
+  <p>
+    <label for="time_entry_issue_id">
+      <%= TimeEntry.human_attribute_name(:issue_id) %>
+      <span class="required">*</span>
+    </label>
+    <%= f.text_field :issue_id, size: 6, required: true %>
+    <span id="time_entry_issue">
+      <%= link_to_issue(@time_entry.issue) if @time_entry.issue.try(:visible?) %>
+    </span>
+  </p>
+  <% if @time_entry.errors[:issue].any? %>
+    <div class="error">
+      <%= @time_entry.errors.full_messages_for(:issue).join(', ') %>
+    </div>
+  <% end %>
+
+  <!-- Date picker với min/max -->
+  <p>
+    <%= f.date_field :spent_on,
+                     size:     10,
+                     required: true,
+                     min:      (@time_entry.issue&.start_date || '').to_s,
+                     max:      (@time_entry.issue&.due_date   || '').to_s %>
+    <%= calendar_for 'time_entry_spent_on' %>
+  </p>
+  <% if @time_entry.issue.present? %>
+    <p class="info">
+      <%= l(:restrict_timelog_form_date_hint,
+            start: @time_entry.issue.start_date,
+            due:   @time_entry.issue.due_date) %>
+    </p>
+  <% end %>
+
+  <!-- Các field còn lại (hours, comments, activity, custom fields, hooks…) -->
+  <p><%= f.hours_field :hours, size: 6, required: true %></p>
+  <p><%= f.text_field :comments, size: 100, maxlength: 1024, required: Setting.timelog_required_fields.include?('comments') %></p>
+  <p><%= f.select :activity_id, activity_collection_for_select_options(@time_entry), required: true %></p>
+  <% @time_entry.editable_custom_field_values.each do |value| %>
+    <p><%= custom_field_tag_with_label :time_entry, value %></p>
+    <% if value.custom_field.full_text_formatting? %>
+      <%= wikitoolbar_for "time_entry_custom_field_values_#{value.custom_field_id}", preview_issue_path(project_id: @project) %>
+    <% end %>
+  <% end %>
+  <%= call_hook(:view_timelog_edit_form_bottom, time_entry: @time_entry, form: f) %>
+</div>
+
+<%= javascript_tag do %>
+  $(function(){
+  // Lấy min/max từ Issue JSON
+  function updateDateBounds(id){
+  if(!id) return;
+  $.get('/issues/' + id + '.json')
+  .done(function(data){
+  var min = data.issue.start_date || '';
+  var max = data.issue.due_date   || '';
+  $('#time_entry_spent_on').attr('min', min).attr('max', max);
+  });
+  }
+
+  $('#time_entry_issue_id').on('change', function(){
+  updateDateBounds($(this).val());
+  });
+
+  // Khởi tạo nếu đã có issue_id
+  updateDateBounds($('#time_entry_issue_id').val());
+  });
+<% end %>

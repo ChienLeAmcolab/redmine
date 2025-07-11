@@ -10,7 +10,7 @@ end
 
 Redmine::Plugin.register :restrict_timelog do
   name        'Restrict Timelog'
-  author      'Your Name'
-  description 'Chặn log time không chọn issue_id'
+  author      'LÊ MINH CHIẾN'
+  description 'Custom Validate Spend Time Logger'
   version     '0.1.0'
 end

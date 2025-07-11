@@ -1,0 +1,7 @@
+en:
+  errors:
+    messages:
+      invalid_tracker: "Logging time on Epic or Story is not allowed."
+      before_issue_start: "Date cannot be before issue start (%{start})"
+      after_issue_due:    "Date cannot be after issue due (%{due})"
+  restrict_timelog_form_date_hint: "Allowed log date: %{start} to %{due}"

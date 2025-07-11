@@ -1,0 +1,7 @@
+vi:
+  errors:
+    messages:
+      invalid_tracker: "Không được phép ghi thời gian cho Epic hoặc Story."
+      before_issue_start: "Ngày không thể trước ngày bắt đầu (%{start})"
+      after_issue_due:    "Ngày không thể sau hạn cuối (%{due})"
+  restrict_timelog_form_date_hint: "Khoảng ngày hợp lệ: %{start} đến %{due}"
