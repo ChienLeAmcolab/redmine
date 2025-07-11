@@ -1,6 +1,5 @@
 <%= error_messages_for 'time_entry' %>
 <%= back_url_hidden_field_tag %>
-
 <div class="box tabular">
   <% if @time_entry.new_record? && params[:project_id] %>
     <%= hidden_field_tag 'project_id', params[:project_id] %>
