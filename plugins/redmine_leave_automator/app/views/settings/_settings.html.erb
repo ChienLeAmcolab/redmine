@@ -1,0 +1,152 @@
+<style>
+    /* 1. Cho phép xuống dòng khi nội dung quá dài */
+    .leave-automator-settings .form-group label,
+    .leave-automator-settings .form-group .select,
+    .leave-automator-settings .form-group .email,
+    .leave-automator-settings .form-group .textarea {
+        white-space: normal; /* MDN: cho phép wrap bình thường :contentReference[oaicite:0]{index=0} */
+        overflow-wrap: break-word; /* MDN: bẻ từ dài nếu không vừa vùng chứa :contentReference[oaicite:1]{index=1} */
+        word-break: break-word; /* alias của overflow-wrap :contentReference[oaicite:2]{index=2} */
+    }
+
+    /* 2. Đảm bảo input/textarea không vượt khỏi container */
+    .leave-automator-settings .select,
+    .leave-automator-settings .email,
+    .leave-automator-settings .number,
+    .leave-automator-settings .textarea {
+        max-width: 100%; /* MDN: giới hạn chiều rộng tối đa :contentReference[oaicite:3]{index=3} */
+        box-sizing: border-box; /* MDN: tính padding/border vào kích thước :contentReference[oaicite:4]{index=4} */
+    }
+
+    /* 3. Tổ chức form-group thành flex column để label nằm trên input */
+    .leave-automator-settings .form-group {
+        display: flex;
+        flex-direction: column; /* MDN: sắp xếp theo cột :contentReference[oaicite:5]{index=5} */
+        margin-bottom: 1em;
+    }
+
+    /* 4. Style cho fieldset để chia vùng rõ ràng */
+    .leave-automator-settings fieldset {
+        padding: 1em;
+        margin-bottom: 1.5em;
+        border: 1px solid #ccc;
+    }
+
+    /* 5. Căn phải nút submit */
+    .leave-automator-settings .form-actions {
+        text-align: right;
+        margin-top: 1em;
+    }
+</style>
+
+
+<%= form_tag plugin_settings_path(:redmine_leave_automator), method: :post, class: 'leave-automator-settings' do %>
+  <fieldset>
+    <legend>Cấu hình Dự án & Tracker</legend>
+
+    <div class="form-group">
+      Tracker Leave
+      <br>
+      <%= select_tag 'settings[target_project_id]',
+                     options_from_collection_for_select(
+                       Project.order(:name), :id, :name,
+                       Setting.plugin_redmine_leave_automator['target_project_id']
+                     ),
+                     include_blank: '– Chọn dự án –',
+                     class: 'select' %>
+    </div>
+
+    <div class="form-group">
+      <%= 'Tracker Leave' %>
+      <%= select_tag 'settings[leave_tracker_id]',
+                     options_from_collection_for_select(
+                       Tracker.order(:position), :id, :name,
+                       Setting.plugin_redmine_leave_automator['leave_tracker_id']
+                     ),
+                     include_blank: '– Chọn tracker –',
+                     class: 'select' %>
+    </div>
+
+    <div class="form-group">
+      <%= 'Leave Activity' %>
+      <%= select_tag 'settings[leave_activity_id]',
+                     options_from_collection_for_select(
+                       Enumeration.where(type: 'TimeEntryActivity').order(:position),
+                       :id, :name,
+                       Setting.plugin_redmine_leave_automator['leave_activity_id']
+                     ),
+                     include_blank: '– Chọn activity –',
+                     class: 'select' %>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Thiết lập Giờ & Email</legend>
+
+    <div class="form-group">
+      <%= 'Số giờ cả ngày' %>
+      <%= number_field_tag 'settings[full_day_hours]',
+                           Setting.plugin_redmine_leave_automator['full_day_hours'],
+                           min: 0, step: 0.5,
+                           class: 'number' %>
+    </div>
+
+    <div class="form-group">
+      <%='Số giờ nửa ngày' %>
+      <%= number_field_tag 'settings[half_day_hours]',
+                           Setting.plugin_redmine_leave_automator['half_day_hours'],
+                           min: 0, step: 0.5,
+                           class: 'number' %>
+    </div>
+
+    <div class="form-group">
+      <%= 'Emails HR (phân tách bằng ,)' %>
+      <%= text_area_tag 'settings[hr_emails]',
+                        Setting.plugin_redmine_leave_automator['hr_emails'],
+                        rows: 2,
+                        placeholder: 'hr1@company.com, hr2@company.com',
+                        class: 'textarea' %>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <%= 'Email CPO' %>
+        <%= email_field_tag 'settings[cpo_email]',
+                            Setting.plugin_redmine_leave_automator['cpo_email'],
+                            placeholder: 'cpo@company.com',
+                            class: 'email' %>
+      </div>
+      <div class="form-group half">
+        <%= 'Email CEO' %>
+        <%= email_field_tag 'settings[ceo_email]',
+                            Setting.plugin_redmine_leave_automator['ceo_email'],
+                            placeholder: 'ceo@company.com',
+                            class: 'email' %>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Email Template (Liquid)</legend>
+
+    <div class="form-group">
+      <%= 'Chủ đề email' %>
+      <%= text_area_tag 'settings[email_subject_template]',
+                        Setting.plugin_redmine_leave_automator['email_subject_template'],
+                        rows: 2,
+                        class: 'textarea monospace' %>
+    </div>
+
+    <div class="form-group">
+      <%= 'Nội dung email' %>
+      <%= text_area_tag 'settings[email_body_template]',
+                        Setting.plugin_redmine_leave_automator['email_body_template'],
+                        rows: 6,
+                        class: 'textarea monospace' %>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <%= submit_tag 'Lưu cấu hình', class: 'button primary' %>
+  </div>
+<% end %>
