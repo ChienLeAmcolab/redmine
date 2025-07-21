@@ -1,0 +1,12 @@
+<!-- plugins/redmine_refresh_sheet/app/views/projects/refresh_sheet_confirm.html.erb -->
+<%# Dùng layout project, show confirm ngay giữa %>
+<h3>Do you want to refresh data for the project, it will take effect after 15 minutes for “<%= @project.name %>” project ?</h3>
+
+<div style="margin-top:1em;">
+  <%= link_to 'Yes, Do It',
+              refresh_sheet_execute_project_path(@project),
+              class: 'button' %>
+
+  &nbsp;
+  <%= link_to 'No, return', project_path(@project), class: 'button' %>
+</div>

@@ -1,0 +1,26 @@
+<!-- plugins/redmine_refresh_sheet/app/views/projects/_refresh_sheet.html.erb -->
+<div id="sheet-refresh-widget" style="margin:1em 0; padding:0.5em; border:1px solid #ccc;">
+
+  <%# Link sang confirm page %>
+  <%= link_to 'Refresh Sheet',
+              refresh_sheet_confirm_project_path(@project),
+              class: 'button' %>
+
+  <%# Hiển thị thời gian click gần nhất nếu có %>
+  <% if t = session["refresh_sheet_last_#{@project.id}"] %>
+    <div style="margin-top:0.5em; font-size:0.9em; color:#555;">
+      The last updated: <%= format_time(t) %>
+    </div>
+  <% end %>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // sau 5 giây, ẩn thẻ flash_notice
+        setTimeout(function() {
+            var flash = document.getElementById('flash_notice');
+            if (flash) {
+                flash.style.display = 'none';
+            }
+        }, 5000);
+    });
+</script>
