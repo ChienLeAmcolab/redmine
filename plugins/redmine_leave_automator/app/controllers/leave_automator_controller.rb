@@ -62,12 +62,11 @@ class LeaveAutomatorController < ApplicationController
       .notification(
         User.current,
         issue,
-        total_hours,
         leave_period_text
       )
-      .deliver_now
+      .deliver_later
 
-    flash[:notice] = 'Log Leave thành công!'
+    flash[:notice] = 'Log Leave Success!'
     redirect_to my_page_path
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:error] = e.record.errors.full_messages.join(', ')

@@ -6,12 +6,12 @@
 
   <div class="field">
     <%= label_tag :start_date, 'Ngày bắt đầu' %><br>
-    <%= date_field_tag :start_date, Date.today, required: true %>
+    <%= date_field_tag :start_date, nil, required: true %>
   </div>
 
   <div class="field">
     <%= label_tag :end_date, 'Ngày kết thúc' %><br>
-    <%= date_field_tag :end_date, Date.today, required: true %>
+    <%= date_field_tag :end_date, nil, required: true %>
   </div>
 
   <div class="field">
@@ -20,7 +20,6 @@
   </div>
 
   <hr>
-
   <div id="day-hours-container">
     <!-- Danh sách các ngày sẽ được JS chèn vào đây -->
   </div>

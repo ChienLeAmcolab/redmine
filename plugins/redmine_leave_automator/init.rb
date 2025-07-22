@@ -16,21 +16,21 @@ Redmine::Plugin.register :redmine_leave_automator do
     'hr_emails'              => '',
     'cpo_email'              => '',
     'ceo_email'              => '',
-    'email_subject_template' => '[{{project.name}}][Leave] {{user.name}} trên {{spent_on}}',
-    'email_body_template'    => <<~BODY
-      Họ & tên: {{ user.name }}
-
-      Lý do xin nghỉ: {{ issue.subject }}
-
-      Thời gian xin nghỉ: {{ leave_period_text }}
-
-      Tổng số giờ nghỉ: {{ total_hours }}
-
-      {% if issue.description and issue.description != "" %}
-      Dự án đang thực hiện + tiến độ:
-      {{ issue.description }}
-      {% endif %}
-    BODY
+    # 'email_subject_template' => '[{{project.name}}][Leave] {{user.name}} trên {{spent_on}}',
+    # 'email_body_template'    => <<~BODY
+    #   Họ & tên: {{ user.name }}
+    #
+    #   Lý do xin nghỉ: {{ issue.subject }}
+    #
+    #   Thời gian xin nghỉ: {{ leave_period_text }}
+    #
+    #   Tổng số giờ nghỉ: {{ total_hours }}
+    #
+    #   {% if issue.description and issue.description != "" %}
+    #   Dự án đang thực hiện + tiến độ:
+    #   {{ issue.description }}
+    #   {% endif %}
+    # BODY
   }, partial: 'settings/settings'
 end
 
