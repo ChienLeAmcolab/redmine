@@ -8,7 +8,7 @@ class LeaveAutomatorController < ApplicationController
   def create
     rp = leave_params
 
-    # Validate ngày
+    # --- Validate ngày ---
     if rp[:start_date].blank? || rp[:end_date].blank?
       flash.now[:error] = 'Bạn phải chọn Ngày bắt đầu và Ngày kết thúc.'
       return render :new
@@ -24,16 +24,20 @@ class LeaveAutomatorController < ApplicationController
       return render :new
     end
 
-    # Config
+    # --- Config ---
     project_id  = Setting.plugin_redmine_leave_automator['target_project_id'].to_i
     tracker_id  = Setting.plugin_redmine_leave_automator['leave_tracker_id'].to_i
     activity_id = Setting.plugin_redmine_leave_automator['leave_activity_id'].to_i
-    non_working = Setting.non_working_week_days.map(&:to_i)
+    half_hours  = Setting.plugin_redmine_leave_automator['half_day_hours'].to_f
+    non_working = Setting.non_working_week_days.map(&:to_i) # [0..6]
 
-    hours_hash = rp[:hours] || {}   # {"YYYY-MM-DD"=>"4"/"8", ...}
+    hours_hash = rp[:hours] || {}        # {"YYYY-MM-DD"=>"4"/"8", ...}
     created_issues = []
 
     ActiveRecord::Base.transaction do
+      # (Optional) tắt mail core nếu Redmine hỗ trợ
+      Issue.skip_notifications = true if Issue.respond_to?(:skip_notifications=)
+
       (start_date..end_date).each do |d|
         next if non_working.include?(d.wday)
 
@@ -62,6 +66,8 @@ class LeaveAutomatorController < ApplicationController
           activity_id: activity_id
         )
       end
+    ensure
+      Issue.skip_notifications = false if Issue.respond_to?(:skip_notifications=)
     end
 
     if created_issues.empty?
@@ -69,20 +75,16 @@ class LeaveAutomatorController < ApplicationController
       return render :new
     end
 
-    # Text hiển thị trong mail view
-    leave_period_text = if start_date == end_date
-                          h = hours_hash[start_date.to_s].to_f
-                          "#{h <= Setting.plugin_redmine_leave_automator['half_day_hours'].to_f ? 'Nửa ngày' : 'Cả ngày'} #{start_date.strftime('%d/%m/%Y')}"
-                        else
-                          "Từ #{start_date.strftime('%d/%m/%Y')} đến #{end_date.strftime('%d/%m/%Y')}"
-                        end
+    # Text hiển thị trong mail view (dùng issue đầu tiên trong view hiện tại)
+    leave_period_text =
+      if start_date == end_date
+        h = hours_hash[start_date.to_s].to_f
+        "#{h <= half_hours ? 'Nửa ngày' : 'Cả ngày'} #{start_date.strftime('%d/%m/%Y')}"
+      else
+        "Từ #{start_date.strftime('%d/%m/%Y')} đến #{end_date.strftime('%d/%m/%Y')}"
+      end
 
-    # Gửi mail: dùng issue đầu tiên để phù hợp view @issue
-    LeaveMailer.with(
-      user:              User.current,
-      issue:             created_issues.first,
-      leave_period_text: leave_period_text
-    ).notification.deliver_later
+    LeaveMailer.notification(User.current, created_issues.first, leave_period_text).deliver_later
 
     flash[:notice] = 'Log Leave Success!'
     redirect_to my_page_path
@@ -95,7 +97,6 @@ class LeaveAutomatorController < ApplicationController
   private
 
   def leave_params
-    # Cho phép hash động dạng hours[YYYY-MM-DD] => '4'/'8'  . :contentReference[oaicite:1]{index=1}
     params.permit(:reason, :start_date, :end_date, :description, hours: {})
   end
 end
