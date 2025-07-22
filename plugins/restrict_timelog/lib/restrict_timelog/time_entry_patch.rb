@@ -1,25 +1,36 @@
-# plugins/restrict_timelog/lib/restrict_timelog/time_entry_patch.rb
 module RestrictTimelog
   module TimeEntryPatch
     def self.included(base)
       base.class_eval do
-        # 1) Cấm log cho tracker Epic/Story
         validate :must_not_log_epic_or_story
-        # 2) Validate ngày trong khoảng start_date..due_date của issue
         validate :date_within_issue_range
 
         private
 
+        # Lấy danh sách tracker được phép ngoại lệ (Array of Integer)
+        def allowed_tracker_ids
+          ids = Setting.plugin_restrict_timelog['allowed_tracker_ids'] || []
+          ids.map(&:to_i)
+        end
+
         def must_not_log_epic_or_story
           return unless issue_id.present? && issue
+
+          # Nếu tracker đang được ngoại lệ, bỏ qua validation
+          return if allowed_tracker_ids.include?(issue.tracker_id)
+
           if issue.tracker.name.in?(%w[Epic Story])
             errors.add(:issue, :invalid_tracker)
           end
         end
 
         def date_within_issue_range
-          # Chỉ chạy nếu có issue và không bị cấm tracker
-          return unless issue_id.present? && issue && !issue.tracker.name.in?(%w[Epic Story]) && spent_on
+          return unless issue_id.present? && issue && spent_on
+
+          # Bỏ qua nếu tracker ngoại lệ
+          return if allowed_tracker_ids.include?(issue.tracker_id)
+          # Bỏ qua nếu tracker Epic/Story (như cũ)
+          return if issue.tracker.name.in?(%w[Epic Story])
 
           if issue.start_date && spent_on < issue.start_date
             errors.add(:spent_on, :before_issue_start,
@@ -33,5 +44,3 @@ module RestrictTimelog
     end
   end
 end
-
-TimeEntry.send(:include, RestrictTimelog::TimeEntryPatch)

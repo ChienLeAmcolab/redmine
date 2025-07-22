@@ -13,4 +13,8 @@ Redmine::Plugin.register :restrict_timelog do
   author      'LÊ MINH CHIẾN'
   description 'Custom Validate Spend Time Logger'
   version     '0.1.0'
+  settings partial: 'settings/restrict_timelog',
+           default: {
+             'allowed_tracker_ids' => []
+           }
 end
