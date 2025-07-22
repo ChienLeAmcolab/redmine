@@ -32,6 +32,7 @@ class LeaveAutomatorController < ApplicationController
       project_id:      Setting.plugin_redmine_leave_automator['target_project_id'].to_i,
       tracker_id:      Setting.plugin_redmine_leave_automator['leave_tracker_id'].to_i,
       author_id:       User.current.id,
+      assigned_to_id:  User.current.id,
       subject:         rp[:reason],
       description:     rp[:description].presence,
       start_date:      start_date,
