@@ -16,6 +16,7 @@ Redmine::Plugin.register :redmine_leave_automator do
     'hr_emails'              => '',
     'cpo_email'              => '',
     'ceo_email'              => '',
+    'pm_role_ids'            => '3',
     # 'email_subject_template' => '[{{project.name}}][Leave] {{user.name}} trên {{spent_on}}',
     # 'email_body_template'    => <<~BODY
     #   Họ & tên: {{ user.name }}

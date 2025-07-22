@@ -19,15 +19,17 @@ class LeaveMailer < Mailer
     list << Setting.plugin_redmine_leave_automator['cpo_email']
     list << Setting.plugin_redmine_leave_automator['ceo_email']
 
+    pm_role_ids = Setting.plugin_redmine_leave_automator['pm_role_ids']
+                         .to_s.split(',').map(&:strip).map(&:to_i)
+
     # PMs + members các dự án active mà user tham gia
     projects = user.projects.where(status: Project::STATUS_ACTIVE)
     pm_emails = projects.flat_map do |p|
       p.members.joins(:roles)
-       .where(roles: { permissions: :manage_project })
+        .where(member_roles: { role_id: pm_role_ids })
        .map { |m| m.user.mail }
     end
-    member_emails = projects.flat_map { |p| p.members.map { |m| m.user.mail } }
 
-    (list + pm_emails + member_emails).compact.uniq
+    (list + pm_emails).compact.uniq
   end
 end
