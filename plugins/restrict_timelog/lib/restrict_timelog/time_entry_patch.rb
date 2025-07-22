@@ -29,7 +29,7 @@ module RestrictTimelog
 
         # Kiểm tra ngày spent_on nằm trong khoảng [start_date, due_date] của issue
         def date_within_issue_range
-          return if issue_id.blank? || spent_on.nil?
+          return if issue_id.blank? || spent_on.nil? || allowed_tracker?
           # nếu issue không có start_date/due_date thì bỏ qua tương ứng
           if issue.start_date && spent_on < issue.start_date
             errors.add(:spent_on, :before_issue_start, start: issue.start_date.to_s)
