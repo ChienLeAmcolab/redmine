@@ -27,7 +27,6 @@ class LeaveAutomatorController < ApplicationController
 
     # Chuỗi mô tả khoảng nghỉ
     leave_period_text = build_leave_period_text(start_date, end_date, hours_hash)
-    binding.pry
     # Tạo Issue
     issue = Issue.new(
       project_id:      Setting.plugin_redmine_leave_automator['target_project_id'].to_i,
@@ -57,7 +56,6 @@ class LeaveAutomatorController < ApplicationController
         activity_id: activity_id
       )
     end
-    binding.pry
     # Gửi mail
     LeaveMailer
       .notification(

@@ -16,12 +16,11 @@ class LeaveMailer < Mailer
                 .gsub('{{project.name}}', @project.name)
                 .gsub('{{user.name}}',    @user.name)
                 .gsub('{{spent_on}}',      Date.today.strftime('%d/%m/%Y'))
-    binding.pry
-    mail(
-      to:      recipients_list,
+    @mail = mail(
+      to: recipients_list,
       subject: subject
     )
-    binding.pry
+    @mail
   end
 
   private
