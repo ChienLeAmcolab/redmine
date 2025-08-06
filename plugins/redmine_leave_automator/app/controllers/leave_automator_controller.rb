@@ -84,8 +84,7 @@ class LeaveAutomatorController < ApplicationController
         "Từ #{start_date.strftime('%d/%m/%Y')} đến #{end_date.strftime('%d/%m/%Y')}"
       end
 
-    LeaveMailer.notification(User.current, created_issues.first, leave_period_text).deliver_later
-
+    LeaveMailer.notification(User.current, created_issues.first, leave_period_text).deliver_now
     flash[:notice] = 'Log Leave Success!'
     redirect_to my_page_path
 
