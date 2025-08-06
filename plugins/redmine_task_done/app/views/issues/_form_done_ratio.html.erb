@@ -1,0 +1,40 @@
+<% forced = Setting.plugin_redmine_task_done['forced_statuses'].to_s.split(',').map(&:strip) %>
+<%# Inline JavaScript to disable/force value without external file %>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleDoneRatio() {
+            var forced = <%= raw Setting.plugin_redmine_task_done['forced_statuses'].inspect %>.split(',').map(function(s){ return s.trim(); });
+            var statusEl = document.getElementById('issue_status_id');
+            var doneEl = document.getElementById('issue_done_ratio');
+            var current = statusEl.options[statusEl.selectedIndex].text;
+            if (forced.indexOf(current) !== -1) {
+                doneEl.value = 100;
+                doneEl.disabled = true;
+            } else {
+                doneEl.disabled = false;
+            }
+        }
+        var sel = document.getElementById('issue_status_id');
+        if (sel) {
+            sel.addEventListener('change', toggleDoneRatio);
+            toggleDoneRatio();
+        }
+    });
+</script>
+
+<% if forced.include?(@issue.status.name) %>
+  <%= f.hidden_field :done_ratio, value: 100 %>
+  <p><strong>Done:</strong> 100%</p>
+<% else %>
+  <%= f.select :done_ratio, (0..10).map { |i| ["#{i*10}%", i*10] }, {}, class: 'form-control', id: 'issue_done_ratio' %>
+<% end %>
+
+# plugins/redmine_task_done/app/views/settings/_task_done_settings.html.erb
+<div class="box">
+  <%= label_tag 'settings_forced_statuses', 'Statuses to force 100% done (comma separated):' %><br/>
+  <%= text_field_tag 'settings[forced_statuses]', Setting.plugin_redmine_task_done['forced_statuses'], size: 60 %>
+</div>
+<div class="box">
+  <%= label_tag 'settings_custom_statuses', 'Statuses with customizable % Done (comma separated):' %><br/>
+  <%= text_field_tag 'settings[custom_statuses]', Setting.plugin_redmine_task_done['custom_statuses'], size: 60 %>
+</div>
