@@ -14,7 +14,7 @@ bind "tcp://0.0.0.0:3000"
 workers 2
 threads 1, 5
 
-preload_app!
+# preload_app!
 
 on_worker_boot do
   require "active_record"
