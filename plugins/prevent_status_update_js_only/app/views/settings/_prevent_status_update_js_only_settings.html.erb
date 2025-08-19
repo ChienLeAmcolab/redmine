@@ -1,0 +1,37 @@
+<%#
+  Settings partial for Prevent Status Update JS Only plugin.
+  Administrators can configure:
+    * blocked_status_id – the ID of the issue status to hide when quota reached.
+    * excluded_tracker_ids – a multi‑select list of tracker IDs to ignore (no hiding).
+    * limit_per_user – number of issues in the blocked status each user is allowed before the option disappears (default 3).
+%>
+
+<% statuses = IssueStatus.order(:position).all %>
+<p>
+  <label for="settings_blocked_status_id"><%= l(:label_issue_status) %> to hide</label><br />
+  <%= select_tag 'settings[blocked_status_id]',
+                 options_from_collection_for_select(statuses, 'id', 'name', settings['blocked_status_id']),
+                 include_blank: true,
+                 id: 'settings_blocked_status_id' %>
+</p>
+
+<% trackers = Tracker.order(:position).all %>
+<p>
+  <label for="settings_excluded_tracker_ids"><%= l(:label_tracker_plural) %> to exclude</label><br />
+  <%= select_tag 'settings[excluded_tracker_ids][]',
+                 options_from_collection_for_select(trackers, 'id', 'name', Array(settings['excluded_tracker_ids'])),
+                 multiple: true,
+                 id: 'settings_excluded_tracker_ids',
+                 style: 'width: 400px;' %>
+  <em class="info"><%= l(:text_select_multiple) rescue 'Use Ctrl/Command to select multiple entries' %></em>
+</p>
+
+<p>
+  <label for="settings_limit_per_user">Limit per user</label><br />
+  <%= number_field_tag 'settings[limit_per_user]',
+                      (settings['limit_per_user'] || 3),
+                      min: 1,
+                      step: 1,
+                      id: 'settings_limit_per_user' %>
+  <em class="info">Number of issues in blocked status allowed per user before the option disappears.</em>
+</p>
