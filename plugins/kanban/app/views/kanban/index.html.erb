@@ -153,16 +153,22 @@
             <label><%= I18n.t(:field_assigned_to) %></label>
           </td>
           <td>
+            <% users_for_dropdown = @current_user.admin? ? @selectable_users : [@current_user] %>
+
             <select name="user_id" id="user_id">
-              <option value="unspecified"
-                      <% if @user_id == "unspecified" then %> selected
-                      <% end %>><%= I18n.t(:kanban_label_unspecified) %></option>
-              <% @selectable_users.each { |user| %>
+              <% if @current_user.admin? %>
+                <option value="unspecified"
+                        <%= (@user_id == "unspecified") ? "selected" : "" %>><%= I18n.t(:kanban_label_unspecified) %></option>
+              <% end %>
+
+              <% users_for_dropdown.each do |user| %>
                 <option value="<%= user.id %>"
-                        <% if @user_id.to_i == user.id then %> selected
-                        <% end %>><%= user.name %></option>
-              <% } %>
+                        <%= (@user_id.to_i == user.id || (!@current_user.admin? && @user_id == "unspecified")) ? "selected" : "" %>>
+                  <%= user.name %>
+                </option>
+              <% end %>
             </select>
+
           </td>
           <td style="width: 100px">
             <label><%= I18n.t(:label_group) %></label>
@@ -238,7 +244,15 @@
               <%= select_tag 'project_ids[]',
                              options_from_collection_for_select(@all_visible_projects, :id, :name, @project_ids),
                              id: 'project_ids', multiple: true, size: 8 %>
-              <span class="info"><%= I18n.t(:button_apply) %> để áp dụng.</span>
+              <!-- NEW: nút chọn tất cả / bỏ chọn -->
+              <button type="button" id="btn_select_all" class="button" style="margin-left:6px;">
+                Select all projects
+              </button>
+              <button type="button" id="btn_clear_all" class="button" style="margin-left:4px;">
+                No select
+              </button>
+
+<!--              <span class="info"><%#= I18n.t(:button_apply) %></span>-->
             </td>
           </tr>
         <% end %>
@@ -420,7 +434,9 @@
                 <p style="writing-mode: vertical-rl; white-space: nowrap;"><%= @user_and_group_names_hash[uid] %></p>
               <% else %>
                 <!-- When user -->
-                <% if Constants::DISPLAY_USER_AVATOR == 1 then %><%= avatar(@selectable_users.find(uid), :size => "16") %>&nbsp;
+                <% if Constants::DISPLAY_USER_AVATOR == 1 %>
+                  <% u = User.find_by(id: uid, type: 'User', status: 1) %>
+                  <%= avatar(u, size: "16") if u %>&nbsp;
                 <% end %>
                 <p style="writing-mode: vertical-rl; white-space: nowrap;"><%= @user_and_group_names_hash[uid] %></p>
               <% end %>
@@ -544,3 +560,21 @@
   <% end %>
 <% } %>
 <p id="open-field-ids" style="display: none;"><%= string_open_fields.strip %></p>
+<script>
+    (function() {
+        let $sel = $('select[name="project_ids[]"]');
+
+        $('#btn_select_all').on('click', function(e) {
+            e.preventDefault();
+            const vals = $sel.find('option:visible').map(function(){ return this.value }).get();
+            $sel.val(vals).trigger('change');
+            console.debug('selected', $sel.val());
+        });
+
+        $('#btn_clear_all').on('click', function(e) {
+            e.preventDefault();
+            $sel.val([]).trigger('change');
+            console.debug('cleared', $sel.val());
+        });
+    })();
+</script>

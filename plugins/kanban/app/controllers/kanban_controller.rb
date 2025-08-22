@@ -139,7 +139,13 @@ class KanbanController < ApplicationController
         @group_id_array << @group_id.to_i
       end
     end
-
+    # --- SIMPLE PATCH: Non-admin chỉ xem issue của chính mình ---
+    unless @current_user.admin?
+      # Chỉ giữ chính mình; không kèm group, không kèm 'Unassigned'
+      @user_id_array = [@current_user.id]
+      @group_id_array = []
+    end
+    # --- END SIMPLE PATCH ---
     # Create hash of users/groups name
     @user_and_group_names_hash = {}
     @selectable_users.each { |user|
