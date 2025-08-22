@@ -197,16 +197,47 @@
             </select>
           </td>
         </tr>
-        <%# --- NEW: Global Kanban project filter (multi-select) --- %>
+        <%# --- NEW: Project scope & Include archived (admin only) --- %>
+        <% if @project_all == "1" %>
+        <tr>
+          <td style="width: 100px">
+            <label>Project scope</label>
+          </td>
+          <td>
+            <select name="project_scope" id="project_scope">
+              <option value="visible" <%= (@project_scope == "visible" || @project_scope.blank?) ? "selected" : "" %> >
+                Visible projects
+              </option>
+              <%# Admin có thêm lựa chọn All %>
+              <% if @current_user.admin? %>
+                <option value="all" <%= (@project_scope == "all") ? "selected" : "" %> >
+                  All projects (admin)
+                </option>
+              <% end %>
+            </select>
+            <% if @current_user.admin? %>
+              &nbsp;&nbsp;
+              <label style="white-space:nowrap;">
+                <input type="checkbox" name="include_archived" value="1" <%= (@include_archived == "1") ? "checked" : "" %> >
+                Include archived
+              </label>
+            <% end %>
+          </td>
+        </tr>
+        <% end %>
+        <%# --- NEW: Global Kanban project filter (multi-select with search) --- %>
         <% if @project_all == "1" %>
           <tr>
             <td style="width: 100px">
               <label><%= I18n.t(:label_project_plural) %></label>
             </td>
             <td>
+              <!-- Search box for filtering project options -->
+              <input type="text" id="project_filter" placeholder="<%= I18n.t(:label_search) %>..." style="margin-bottom:6px; width: 260px;">
+              <!-- Multi-select list of projects -->
               <%= select_tag 'project_ids[]',
                              options_from_collection_for_select(@all_visible_projects, :id, :name, @project_ids),
-                             multiple: true, size: 8 %>
+                             id: 'project_ids', multiple: true, size: 8 %>
               <span class="info"><%= I18n.t(:button_apply) %> để áp dụng.</span>
             </td>
           </tr>
@@ -332,6 +363,22 @@
   <input name="project_id" type="hidden" value="<%= @project_id %>">
   <input name="scroll_top" id="scroll_top" type="hidden" value="0">
 </form>
+<!-- Script for filtering project list in multi-select -->
+<script>
+  (function() {
+    var $filter = $('#project_filter');
+    var $sel = $('#project_ids');
+    if ($filter.length && $sel.length) {
+      $filter.on('input', function() {
+        var q = $.trim(this.value).toLowerCase();
+        $sel.find('option').each(function() {
+          var show = this.text.toLowerCase().indexOf(q) !== -1;
+          $(this).toggle(show);
+        });
+      });
+    }
+  })();
+</script>
 <!-- Update and clear links -->
 <p class="buttons">
   <a href="#" onclick="$('#form1').submit(); return false;" class="icon icon-checked"><%= I18n.t(:button_apply) %></a>
