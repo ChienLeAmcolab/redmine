@@ -313,8 +313,23 @@ class KanbanController < ApplicationController
   # Get issues visibility condition based on user's role settings
   #
   def load_visible_projects
-    # Danh sách project mà user hiện tại được phép xem
-    @all_visible_projects = Project.visible(@current_user).active.order(:lft)
+    set_user if @current_user.nil?
+    # Use session values when available to determine scope before restore_params
+    session_hash = session[:kanban]
+    temp_scope = params[:project_scope] || (session_hash && session_hash["project_scope"]) || "visible"
+    temp_include_archived = params[:include_archived] || (session_hash && session_hash["include_archived"]) || "0"
+    # Determine base scope of projects
+    if @current_user&.admin? && temp_scope.to_s == "all"
+      base = Project.order(:lft)
+    else
+      base = Project.visible(@current_user).order(:lft)
+    end
+    # Determine if archived projects should be included (admin only)
+    if @current_user&.admin? && temp_include_archived.to_s == "1"
+      @all_visible_projects = base
+    else
+      @all_visible_projects = base.active
+    end
   end
 
   def get_issues_visibility_condition
@@ -371,6 +386,9 @@ class KanbanController < ApplicationController
   def store_params_to_session
 
     session_hash = {}
+    # Save project_scope and include_archived for the global project filter
+    session_hash["project_scope"]    = @project_scope
+    session_hash["include_archived"] = @include_archived
     session_hash["project_ids"] = @project_ids
     session_hash["updated_within"] = @updated_within
     session_hash["done_within"] = @done_within
@@ -393,6 +411,18 @@ class KanbanController < ApplicationController
   #
   def restore_params_from_session
     session_hash = session[:kanban]
+    # Restore project_scope (visible or all) and include_archived toggle
+    if !session_hash.blank? && params[:project_scope].blank?
+      @project_scope = session_hash["project_scope"]
+    else
+      @project_scope = params[:project_scope]
+    end
+    if !session_hash.blank? && params[:include_archived].blank?
+      @include_archived = session_hash["include_archived"]
+    else
+      @include_archived = params[:include_archived]
+    end
+
     # Project IDs (lọc khi ở chế độ tổng)
     if !session_hash.blank? && params[:project_ids].blank?
       @project_ids = session_hash["project_ids"]
@@ -542,6 +572,18 @@ class KanbanController < ApplicationController
       if @project_all.blank? then
         @project_all = "0"
       end
+    end
+
+    # Normalize project_scope and include_archived default values
+    # Acceptable values for project_scope are "visible" (default) or "all" (admin only)
+    if @project_scope.nil? || !%w[visible all].include?(@project_scope.to_s)
+      @project_scope = "visible"
+    end
+    # Only admin can keep include_archived = "1"
+    if @include_archived.to_s == "1" && @current_user&.admin?
+      @include_archived = "1"
+    else
+      @include_archived = "0"
     end
 
     # Project IDs filter (chỉ dùng khi @project_all == "1")
