@@ -19,9 +19,9 @@
         <strong><%= author.name %></strong>
         <%# Determine if the colleague is off for a single day or a range %>
         <% if start_date == end_date %>
-          đang nghỉ ngày <%= l(start_date) %>
+          on leave on <%= start_date %>
         <% else %>
-          đang nghỉ từ <%= l(start_date) %> đến <%= l(end_date) %>
+          on leave from <%= start_date %> đến <%= end_date %>
         <% end %>
       </span>
       <button type="button" style="position:absolute;right:6px;top:4px;background:none;border:none;color:#333;font-size:16px;line-height:1;cursor:pointer;" onclick="dismissLeaveAlert('<%= issue_id %>')">&times;</button>
