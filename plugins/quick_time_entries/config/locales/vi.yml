@@ -1,0 +1,25 @@
+---
+vi:
+  label_quick_time_entries: "Nhập thời gian nhanh"
+  label_remaining_time: "Còn lại"
+  label_hours: "Giờ"
+  label_spent_time: "Đã làm"
+  label_summary_today: "Tổng kết hôm nay"
+  label_view_past_hours: "Xem giờ đã ghi"
+  label_filters: "Bộ lọc công việc"
+  label_log_time_for_issues: "Ghi thời gian cho các công việc"
+
+  # Bản dịch dự phòng cho các trường và nút chung của Redmine.
+  field_id: "ID"
+  field_subject: "Tiêu đề"
+  field_project: "Dự án"
+  field_estimated_hours: "Thời gian ước lượng"
+  field_spent_on: "Ngày"
+  field_comments: "Nhận xét"
+  field_tracker: "Loại công việc"
+  field_due_date: "Ngày hạn"
+  button_apply: "Áp dụng"
+  button_save: "Lưu"
+  label_no_data: "Không có dữ liệu"
+
+  text_no_data_added: "Dữ liệu không phù hợp"

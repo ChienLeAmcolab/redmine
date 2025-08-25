@@ -1,0 +1,28 @@
+---
+en:
+  label_quick_time_entries: "Quick log time"
+  label_remaining_time: "Remaining"
+  label_hours: "Hours"
+  label_spent_time: "Spent"
+
+  # Section titles for improved UI
+  label_summary_today: "Today's summary"
+  label_view_past_hours: "View past hours"
+  label_filters: "Filter tasks"
+  label_log_time_for_issues: "Log time for issues"
+
+  # Fallback translations for common Redmine fields and buttons.  These
+  # duplicates ensure the plugin works even if the host application does not
+  # expose the default keys in the current locale.
+  field_id: "ID"
+  field_subject: "Subject"
+  field_project: "Project"
+  field_estimated_hours: "Estimated hours"
+  field_spent_on: "Date"
+  field_comments: "Comment"
+  field_tracker: "Tracker"
+  field_due_date: "Due date"
+  button_apply: "Apply"
+  button_save: "Save"
+  label_no_data: "No data"
+  text_no_data_added: "Text No Data Added"

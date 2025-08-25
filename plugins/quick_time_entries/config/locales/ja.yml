@@ -1,0 +1,25 @@
+---
+ja:
+  label_quick_time_entries: "クイック時間記録"
+  label_remaining_time: "残り"
+  label_hours: "時間"
+  label_spent_time: "消費"
+  label_summary_today: "今日の概要"
+  label_view_past_hours: "過去の時間を表示"
+  label_filters: "タスクのフィルター"
+  label_log_time_for_issues: "チケットの時間記録"
+
+  # Redmine の一般的なフィールドやボタンの予備翻訳
+  field_id: "ID"
+  field_subject: "件名"
+  field_project: "プロジェクト"
+  field_estimated_hours: "予定時間"
+  field_spent_on: "日付"
+  field_comments: "コメント"
+  field_tracker: "トラッカー"
+  field_due_date: "期限日"
+  button_apply: "適用"
+  button_save: "保存"
+  label_no_data: "データがありません"
+
+  text_no_data_added: ""
