@@ -1,28 +1,37 @@
 ---
 en:
-  label_quick_time_entries: "Quick log time"
-  label_remaining_time: "Remaining"
-  label_hours: "Hours"
-  label_spent_time: "Spent"
+  # All keys in this file are namespaced with 'quick_time_entries_' to avoid
+  # clashing with core Redmine translations or other plugins.  Each original
+  # key has been prefixed accordingly.  Update the views and controllers to
+  # reference these namespaced keys (e.g. l(:quick_time_entries_label_hours)).
+  quick_time_entries_label_quick_time_entries: "Quick log time"
+  quick_time_entries_label_remaining_time: "Remaining"
+  quick_time_entries_label_hours: "Hours"
+  quick_time_entries_label_spent_time: "Spent"
 
   # Section titles for improved UI
-  label_summary_today: "Today's summary"
-  label_view_past_hours: "View past hours"
-  label_filters: "Filter tasks"
-  label_log_time_for_issues: "Log time for issues"
+  quick_time_entries_label_summary_today: "Today's summary"
+  quick_time_entries_label_view_past_hours: "View past hours"
+  quick_time_entries_label_filters: "Filter tasks"
+  quick_time_entries_label_log_time_for_issues: "Log time for issues"
 
-  # Fallback translations for common Redmine fields and buttons.  These
-  # duplicates ensure the plugin works even if the host application does not
-  # expose the default keys in the current locale.
-  field_id: "ID"
-  field_subject: "Subject"
-  field_project: "Project"
-  field_estimated_hours: "Estimated hours"
-  field_spent_on: "Date"
-  field_comments: "Comment"
-  field_tracker: "Tracker"
-  field_due_date: "Due date"
-  button_apply: "Apply"
-  button_save: "Save"
-  label_no_data: "No data"
-  text_no_data_added: "Text No Data Added"
+  # Plugin‑scoped field/button/label translations to avoid collisions.
+  quick_time_entries_field_id: "ID"
+  quick_time_entries_field_subject: "Subject"
+  quick_time_entries_field_project: "Project"
+  quick_time_entries_field_estimated_hours: "Estimated hours"
+  quick_time_entries_field_spent_on: "Date"
+  quick_time_entries_field_comments: "Comment"
+  quick_time_entries_field_tracker: "Tracker"
+  quick_time_entries_field_due_date: "Due date"
+
+  quick_time_entries_button_apply: "Apply"
+  quick_time_entries_button_save: "Save"
+
+  quick_time_entries_label_no_data: "No data"
+  quick_time_entries_text_no_data_added: "Text No Data Added"
+
+  # Labels for due date range filtering.  These allow users to filter
+  # issues between a start and end date rather than by a single date.
+  quick_time_entries_label_due_date_from: "Due date from"
+  quick_time_entries_label_due_date_to: "Due date to"

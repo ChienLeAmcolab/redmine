@@ -32,6 +32,7 @@ Redmine::Plugin.register :quick_time_entries do
   # The caption uses a translation key defined in the plugin’s locale file.
   menu :top_menu, :quick_time_entries,
        { :controller => 'quick_time_entries', :action => 'index' },
-       :caption => :label_quick_time_entries,
+       # Use the namespaced translation key defined in the plugin locale files
+       :caption => :quick_time_entries_label_quick_time_entries,
        :if => Proc.new { User.current.logged? }
 end

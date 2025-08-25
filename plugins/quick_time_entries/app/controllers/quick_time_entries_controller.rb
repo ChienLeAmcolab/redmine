@@ -21,7 +21,11 @@ class QuickTimeEntriesController < ApplicationController
 
     @selected_project_id = params[:project_id].presence
     @selected_tracker_id = params[:tracker_id].presence
-    @selected_due_date = params[:due_date].presence
+    # Capture date range filters instead of a single due date. If present,
+    # these will be used to filter issues with due_date on or after the start date
+    # and/or on or before the end date.
+    @selected_due_date_start = params[:due_date_start].presence
+    @selected_due_date_end   = params[:due_date_end].presence
 
     issues = Issue.includes(:status, :project)
                   .where(:assigned_to_id => User.current.id)
@@ -32,12 +36,24 @@ class QuickTimeEntriesController < ApplicationController
     if @selected_tracker_id
       issues = issues.where(:tracker_id => @selected_tracker_id)
     end
-    if @selected_due_date
+    # Apply due date range filtering. If only the start date is present, return
+    # issues with a due date on or after that date. If only the end date is
+    # present, return issues with a due date on or before that date. If both
+    # are present, return issues with a due date in the specified range.
+    if @selected_due_date_start.present?
       begin
-        date = Date.parse(@selected_due_date)
-        issues = issues.where('issues.due_date <= ?', date)
+        date_start = Date.parse(@selected_due_date_start)
+        issues = issues.where('issues.due_date >= ?', date_start)
       rescue ArgumentError
-        # Ignore invalid date
+        # Ignore invalid start date
+      end
+    end
+    if @selected_due_date_end.present?
+      begin
+        date_end = Date.parse(@selected_due_date_end)
+        issues = issues.where('issues.due_date <= ?', date_end)
+      rescue ArgumentError
+        # Ignore invalid end date
       end
     end
 
@@ -107,9 +123,14 @@ class QuickTimeEntriesController < ApplicationController
     if saved_count > 0
       flash[:notice] = l(:notice_successful_update)
     else
-      flash[:warning] = l(:text_no_data_added)
+      # Use the namespaced key for the plugin to avoid clashing with other plugins
+      flash[:warning] = l(:quick_time_entries_text_no_data_added)
     end
-    redirect_to :action => 'index', :project_id => params[:project_id], :tracker_id => params[:tracker_id], :due_date => params[:due_date]
+    redirect_to :action => 'index',
+                :project_id => params[:project_id],
+                :tracker_id => params[:tracker_id],
+                :due_date_start => params[:due_date_start],
+                :due_date_end   => params[:due_date_end]
   end
 
   private
