@@ -1,0 +1,15 @@
+Họ & tên: <%= @user.name %>
+
+Lý do xin nghỉ:
+<%= @issue.subject %>
+
+Thời gian xin nghỉ:
+<%= @leave_period_text %>
+
+Tổng số giờ nghỉ:
+<%= @total_hours %>
+
+<% if @issue.description.present? %>
+  Dự án đang thực hiện + tiến độ:
+  <%= @issue.description %>
+<% end %>

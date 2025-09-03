@@ -1,0 +1,23 @@
+<fieldset class="box">
+  <legend><%= l(:label_restrict_timelog_settings) %></legend>
+  <table>
+    <tr>
+      <th>
+      </th>
+      <td>
+        <%= select_tag 'settings[allowed_tracker_ids][]',
+                       options_from_collection_for_select(
+                         Tracker.order(:position), :id, :name,
+                         (settings['allowed_tracker_ids'] || []).map(&:to_s)
+                       ),
+                       include_blank: true,
+                       multiple: true,
+                       size: 5,
+                       id: 'settings_allowed_tracker_ids' %>
+        <p class="description">
+          <%= l(:help_restrict_timelog_allowed_trackers) %>
+        </p>
+      </td>
+    </tr>
+  </table>
+</fieldset>

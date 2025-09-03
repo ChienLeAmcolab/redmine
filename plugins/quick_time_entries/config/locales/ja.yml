@@ -1,0 +1,31 @@
+---
+ja:
+  # すべてのキーに quick_time_entries_ プレフィックスを付けて、Redmine本体や他のプラグインとの衝突を防ぎます。
+  quick_time_entries_label_quick_time_entries: "クイック時間記録"
+  quick_time_entries_label_remaining_time: "残り"
+  quick_time_entries_label_hours: "時間"
+  quick_time_entries_label_spent_time: "消費"
+  quick_time_entries_label_summary_today: "今日の概要"
+  quick_time_entries_label_view_past_hours: "過去の時間を表示"
+  quick_time_entries_label_filters: "タスクのフィルター"
+  quick_time_entries_label_log_time_for_issues: "チケットの時間記録"
+
+  # Redmine の一般的なフィールドやボタンの翻訳をプラグイン専用にしたもの
+  quick_time_entries_field_id: "ID"
+  quick_time_entries_field_subject: "件名"
+  quick_time_entries_field_project: "プロジェクト"
+  quick_time_entries_field_estimated_hours: "予定時間"
+  quick_time_entries_field_spent_on: "日付"
+  quick_time_entries_field_comments: "コメント"
+  quick_time_entries_field_tracker: "トラッカー"
+  quick_time_entries_field_due_date: "期限日"
+
+  quick_time_entries_button_apply: "適用"
+  quick_time_entries_button_save: "保存"
+
+  quick_time_entries_label_no_data: "データがありません"
+  quick_time_entries_text_no_data_added: ""
+
+  # 期限日検索の範囲指定用ラベル。開始日と終了日を指定して検索できるようにする。
+  quick_time_entries_label_due_date_from: "期限開始日"
+  quick_time_entries_label_due_date_to: "期限終了日"

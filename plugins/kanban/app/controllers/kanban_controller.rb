@@ -3,14 +3,15 @@ class KanbanController < ApplicationController
     unloadable
   end
   before_action :global_authorize
+  before_action :load_visible_projects
   #
   # Display kanban board
   #
-  def index 
+  def index
     # Do not cache on browser back
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0'
     response.headers['Pragma'] = 'no-cache'
-    
+
     # Discard session
     if params[:clear].to_i == 1 then
       discard_session
@@ -31,41 +32,58 @@ class KanbanController < ApplicationController
     else
       @user = User.find(@user_id.to_i)
     end
-  
+
     # Get current project
     if @project_id.blank? then
       @project = nil
     else
       @project = Project.find(@project_id)
     end
-    
-    # Get users for assignee filetr
+
+    # Get users for assignee filter
     if @project_all == "1" then
-      @selectable_users = User.where(type: "User").where(status: 1)
+      if @project_ids.present?
+        # User là member của các project đã chọn hoặc từng được assign issue trong các project đó
+        role_users = User.joins(:members).where(members: { project_id: @project_ids })
+                         .where(type: "User", status: 1).distinct
+        assigned_user_ids = Issue.where(project_id: @project_ids)
+                                 .where.not(assigned_to_id: nil)
+                                 .pluck(:assigned_to_id).uniq
+        @selectable_users = User.where(id: (role_users.pluck(:id) + assigned_user_ids).uniq)
+                                .where(type: "User", status: 1)
+      else
+        @selectable_users = User.where(type: "User").where(status: 1)
+      end
     else
       # Get users who have roles in the project
       project_users = @project.users
-      
+
       # Get users who are assigned to issues in the project (including those without roles)
       assigned_user_ids = Issue.where(project_id: @project.id)
                                .where.not(assigned_to_id: nil)
                                .pluck(:assigned_to_id)
                                .uniq
-      
+
       assigned_users = User.where(id: assigned_user_ids, type: "User", status: 1)
-      
+
       # Combine project users and assigned users
       @selectable_users = User.where(id: (project_users.pluck(:id) + assigned_users.pluck(:id)).uniq)
-                             .where(type: "User", status: 1)
+                              .where(type: "User", status: 1)
     end
 
-    # Get groups for group filetr
+    # Get groups for group filter
     if @project_all == "1" then
-      @selectable_groups = Group.where(type: "Group")
+      if @project_ids.present?
+        members = Member.where(project_id: @project_ids)
+        member_user_ids = members.pluck(:user_id)
+        @selectable_groups = Group.where(type: "Group").where(id: member_user_ids)
+      else
+        @selectable_groups = Group.where(type: "Group")
+      end
     else
       members = Member.where(project_id: @project.id)
       member_user_ids = []
-      members.each {|member|
+      members.each { |member|
         member_user_ids << member.user_id
       }
       @selectable_groups = Group.where(type: "Group").where(id: member_user_ids)
@@ -84,7 +102,7 @@ class KanbanController < ApplicationController
       end
     else
       # Case group is specified
-      @selectable_groups.each {|group|
+      @selectable_groups.each { |group|
         if group.id == @group_id.to_i
           @user_id_array = group.user_ids
         end
@@ -93,7 +111,7 @@ class KanbanController < ApplicationController
 
     # Remove inactive users from array of display users
     copied_user_id_array = @user_id_array.dup
-    copied_user_id_array.each {|id|
+    copied_user_id_array.each { |id|
       if !@selectable_users.ids.include?(id) then
         @user_id_array.delete(id)
       end
@@ -112,36 +130,42 @@ class KanbanController < ApplicationController
     @group_id_array = []
     if Setting.issue_group_assignment? then
       if @group_id == "unspecified" then
-        @selectable_groups.each {|group|
-            @user_id_array << group.id
-            @group_id_array << group.id
+        @selectable_groups.each { |group|
+          @user_id_array << group.id
+          @group_id_array << group.id
         }
       else
         @user_id_array << @group_id.to_i
         @group_id_array << @group_id.to_i
       end
     end
-
+    # --- SIMPLE PATCH: Non-admin chỉ xem issue của chính mình ---
+    unless @current_user.admin?
+      # Chỉ giữ chính mình; không kèm group, không kèm 'Unassigned'
+      @user_id_array = [@current_user.id]
+      @group_id_array = []
+    end
+    # --- END SIMPLE PATCH ---
     # Create hash of users/groups name
     @user_and_group_names_hash = {}
-    @selectable_users.each {|user|
+    @selectable_users.each { |user|
       @user_and_group_names_hash[user.id] = user.name
     }
-    @selectable_groups.each {|group|
+    @selectable_groups.each { |group|
       @user_and_group_names_hash[group.id] = group.name
     }
 
     # Get all status orderby position
     @issue_statuses = IssueStatus.all.order("position ASC")
     @issue_statuses_hash = {}
-    @issue_statuses.each {|issue_status|
+    @issue_statuses.each { |issue_status|
       @issue_statuses_hash[issue_status.id.to_i] = issue_status.name
     }
 
     # Get statuses for issue closed
     @done_issue_statuses = IssueStatus.where(is_closed: 1)
     @done_issue_statuses_array = []
-    @done_issue_statuses.each {|issue_status|
+    @done_issue_statuses.each { |issue_status|
       @done_issue_statuses_array << issue_status.id
     }
 
@@ -172,46 +196,56 @@ class KanbanController < ApplicationController
     due_from = ""
     due_to = ""
     due_now = Time.now
-    case @due_date 
-      when "overdue" then
-        due_from = "1970-01-01"
-        due_to = due_now.yesterday.strftime("%Y-%m-%d")
-      when "today" then
-        due_from = due_now.strftime("%Y-%m-%d")
-        due_to = due_from
-      when "tommorow" then
-        due_from = due_now.tomorrow.strftime("%Y-%m-%d")
-        due_to = due_from
-      when "thisweek" then
-        due_from = due_now.beginning_of_week.strftime("%Y-%m-%d")
-        due_to = due_now.end_of_week.strftime("%Y-%m-%d")
-      when "nextweek" then
-        due_from = due_now.next_week.beginning_of_week.strftime("%Y-%m-%d")
-        due_to = due_now.next_week.end_of_week.strftime("%Y-%m-%d")
+    case @due_date
+    when "overdue" then
+      due_from = "1970-01-01"
+      due_to = due_now.yesterday.strftime("%Y-%m-%d")
+    when "today" then
+      due_from = due_now.strftime("%Y-%m-%d")
+      due_to = due_from
+    when "tommorow" then
+      due_from = due_now.tomorrow.strftime("%Y-%m-%d")
+      due_to = due_from
+    when "thisweek" then
+      due_from = due_now.beginning_of_week.strftime("%Y-%m-%d")
+      due_to = due_now.end_of_week.strftime("%Y-%m-%d")
+    when "nextweek" then
+      due_from = due_now.next_week.beginning_of_week.strftime("%Y-%m-%d")
+      due_to = due_now.next_week.end_of_week.strftime("%Y-%m-%d")
     end
 
     # Get issues related to display users
     issues_for_projects = Issue.where(assigned_to_id: @user_id_array)
-      .where("updated_on >= '" + updated_from + "'")
-      .where(get_issues_visibility_condition)
-
+                                   .where("updated_on >= '" + updated_from + "'")
+                                   .where(get_issues_visibility_condition)
+    
+    # If in global mode and some projects are selected, restrict issues to those projects
+    if @project_all == "1" && @project_ids.present?
+      issues_for_projects = issues_for_projects.where(project_id: @project_ids)
+    end
+    
     if Constants::SELECT_LIMIT_STRATEGY == 1 then
       issues_for_projects = issues_for_projects.limit(Constants::SELECT_LIMIT)
     end
-
+    
     # Unique project IDs
     unique_project_id_array = []
-    if @project_all == "1" then
-      issues_for_projects.each {|issue|
-        if unique_project_id_array.include?(issue.project.id.to_i) == false then
-          unique_project_id_array << issue.project.id.to_i
+    if @project_all == "1"
+      if @project_ids.present?
+        # When specific projects are selected in global mode, include them (and their subprojects) in the list
+        @project_ids.each do |proj_id|
+          fill_subproject_ids(proj_id.to_i, unique_project_id_array)
         end
-      }
+      else
+        # If no specific project filter, gather project ids from the user's issues
+        issues_for_projects.each { |issue|
+          unique_project_id_array << issue.project.id.to_i unless unique_project_id_array.include?(issue.project.id.to_i)
+        }
+      end
     else
       # When select one project, add subproject IDs
       fill_subproject_ids(@project.id.to_i, unique_project_id_array)
     end
-
     # Display no assignee issue
     @user_id_array << nil;
 
@@ -220,14 +254,14 @@ class KanbanController < ApplicationController
     @wip_hash = {}
 
     # Get issues using status loop
-    @status_fields_array.each {|status_id|
+    @status_fields_array.each { |status_id|
       if @done_issue_statuses_array.include?(status_id) == false then
         # Case not closed status
         issues = Issue.where(assigned_to_id: @user_id_array)
-          .where(project_id: unique_project_id_array)
-          .where(status: status_id)
-          .where(get_issues_visibility_condition)
-          .where("updated_on >= '" + updated_from + "'")
+                      .where(project_id: unique_project_id_array)
+                      .where(status: status_id)
+                      .where(get_issues_visibility_condition)
+                      .where("updated_on >= '" + updated_from + "'")
         if @version_id != "unspecified" then
           issues = issues.where(fixed_version_id: @version_id)
         end
@@ -240,9 +274,9 @@ class KanbanController < ApplicationController
         @issues_hash[status_id] = issues.order(updated_on: "DESC").limit(Constants::SELECT_LIMIT)
         # Count WIP issues
         if status_id == Constants::WIP_COUNT_STATUS_FIELD then
-          @user_id_array.each {|uid|
+          @user_id_array.each { |uid|
             wip_counter = 0
-            @issues_hash[status_id].each {|issue|
+            @issues_hash[status_id].each { |issue|
               if issue.assigned_to_id == uid then
                 wip_counter += 1
               end
@@ -256,10 +290,10 @@ class KanbanController < ApplicationController
       else
         # Case closed status
         issues = Issue.where(assigned_to_id: @user_id_array)
-            .where(project_id: unique_project_id_array)
-            .where(status: status_id)
-            .where(get_issues_visibility_condition)
-            .where("updated_on >= '" + closed_from + "'")
+                      .where(project_id: unique_project_id_array)
+                      .where(status: status_id)
+                      .where(get_issues_visibility_condition)
+                      .where("updated_on >= '" + closed_from + "'")
         if @version_id != "unspecified" then
           issues = issues.where(fixed_version_id: @version_id)
         end
@@ -276,14 +310,34 @@ class KanbanController < ApplicationController
     # Hide user without issues
     if Constants::DISPLAY_USER_WITHOUT_ISSUES != 1 then
       remove_user_without_issues
-    end    
+    end
   end
-  
+
   private
 
   #
   # Get issues visibility condition based on user's role settings
   #
+  def load_visible_projects
+    set_user if @current_user.nil?
+    # Use session values when available to determine scope before restore_params
+    session_hash = session[:kanban]
+    temp_scope = params[:project_scope] || (session_hash && session_hash["project_scope"]) || "visible"
+    temp_include_archived = params[:include_archived] || (session_hash && session_hash["include_archived"]) || "0"
+    # Determine base scope of projects
+    if @current_user&.admin? && temp_scope.to_s == "all"
+      base = Project.order(:lft)
+    else
+      base = Project.visible(@current_user).order(:lft)
+    end
+    # Determine if archived projects should be included (admin only)
+    if @current_user&.admin? && temp_include_archived.to_s == "1"
+      @all_visible_projects = base
+    else
+      @all_visible_projects = base.active
+    end
+  end
+
   def get_issues_visibility_condition
     if @current_user.admin?
       # Admin can see all issues
@@ -312,13 +366,13 @@ class KanbanController < ApplicationController
       # 'default' - can see non-private issues or issues created by/assigned to user
       user_ids = [@current_user.id] + @current_user.groups.pluck(:id).compact
       return "(#{Issue.table_name}.is_private = #{Issue.connection.quoted_false} " \
-             "OR #{Issue.table_name}.author_id = #{@current_user.id} " \
-             "OR #{Issue.table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
+        "OR #{Issue.table_name}.author_id = #{@current_user.id} " \
+        "OR #{Issue.table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
     elsif visibility_levels.include?('own')
       # 'own' - can only see issues created by or assigned to user
       user_ids = [@current_user.id] + @current_user.groups.pluck(:id).compact
       return "(#{Issue.table_name}.author_id = #{@current_user.id} OR " \
-             "#{Issue.table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
+        "#{Issue.table_name}.assigned_to_id IN (#{user_ids.join(',')}))"
     else
       # Fallback to most restrictive
       return '1=0'
@@ -338,6 +392,10 @@ class KanbanController < ApplicationController
   def store_params_to_session
 
     session_hash = {}
+    # Save project_scope and include_archived for the global project filter
+    session_hash["project_scope"]    = @project_scope
+    session_hash["include_archived"] = @include_archived
+    session_hash["project_ids"] = @project_ids
     session_hash["updated_within"] = @updated_within
     session_hash["done_within"] = @done_within
     session_hash["due_date"] = @due_date
@@ -359,7 +417,25 @@ class KanbanController < ApplicationController
   #
   def restore_params_from_session
     session_hash = session[:kanban]
-    
+    # Restore project_scope (visible or all) and include_archived toggle
+    if !session_hash.blank? && params[:project_scope].blank?
+      @project_scope = session_hash["project_scope"]
+    else
+      @project_scope = params[:project_scope]
+    end
+    if !session_hash.blank? && params[:include_archived].blank?
+      @include_archived = session_hash["include_archived"]
+    else
+      @include_archived = params[:include_archived]
+    end
+
+    # Project IDs (lọc khi ở chế độ tổng)
+    if !session_hash.blank? && params[:project_ids].blank?
+      @project_ids = session_hash["project_ids"]
+    else
+      @project_ids = params[:project_ids]
+    end
+
     # Days since upadated date
     if !session_hash.blank? && params[:updated_within].blank?
       @updated_within = session_hash["updated_within"]
@@ -387,7 +463,7 @@ class KanbanController < ApplicationController
     else
       @tracker_id = params[:tracker_id]
     end
-    
+
     # Display user ID
     if !session_hash.blank? && params[:user_id].blank?
       @user_id = session_hash["user_id"]
@@ -426,7 +502,7 @@ class KanbanController < ApplicationController
     # Selected statuses
     if !session_hash.blank? && params[:status_fields].blank?
       if !session_hash["status_fields"].blank?
-        @status_fields = JSON.parse( session_hash["status_fields"])
+        @status_fields = JSON.parse(session_hash["status_fields"])
       else
         @status_fields = ""
       end
@@ -465,7 +541,7 @@ class KanbanController < ApplicationController
     if @updated_within.nil? || (@updated_within.to_i == 0 && @updated_within != "unspecified") then
       @updated_within = Constants::DEFAULT_VALUE_UPDATED_WITHIN
     end
-    
+
     # Days since closed date
     if @done_within.nil? || (@done_within.to_i == 0 && @done_within != "unspecified") then
       @done_within = Constants::DEFAULT_VALUE_DONE_WITHIN
@@ -486,7 +562,7 @@ class KanbanController < ApplicationController
     if @user_id.nil? || (@user_id.to_i == 0 && @user_id != "unspecified") then
       @user_id = @current_user.id
     end
-    
+
     # Group ID
     if @group_id.nil? || @group_id.to_i == 0 then
       @group_id = "unspecified"
@@ -504,6 +580,30 @@ class KanbanController < ApplicationController
       end
     end
 
+    # Normalize project_scope and include_archived default values
+    # Acceptable values for project_scope are "visible" (default) or "all" (admin only)
+    if @project_scope.nil? || !%w[visible all].include?(@project_scope.to_s)
+      @project_scope = "visible"
+    end
+    # Only admin can keep include_archived = "1"
+    if @include_archived.to_s == "1" && @current_user&.admin?
+      @include_archived = "1"
+    else
+      @include_archived = "0"
+    end
+
+    # Project IDs filter (chỉ dùng khi @project_all == "1")
+    if @project_all == "1"
+      @project_ids = Array(@project_ids).reject(&:blank?).map(&:to_i)
+      if @project_ids.present?
+        # Chỉ giữ project mà user nhìn thấy
+        visible_ids = @all_visible_projects.pluck(:id)
+        @project_ids &= visible_ids
+      end
+    else
+      # Khi đang ở chế độ 1 project, bỏ qua danh sách nhiều project
+      @project_ids = []
+    end
     # Version ID
     if @version_id.nil? || @version_id.to_i == 0 || @project_all == "1" then
       @version_id = "unspecified"
@@ -517,7 +617,7 @@ class KanbanController < ApplicationController
     # Array of status ID for display
     @status_fields_array = []
     if !@status_fields.blank? then
-      @status_fields.each {|id,chk|
+      @status_fields.each { |id, chk|
         if chk == "1"
           @status_fields_array << id.to_i
         end
@@ -538,7 +638,7 @@ class KanbanController < ApplicationController
     end
 
     # Show ancestors (default)
-    if @show_ancestors.nil?  then
+    if @show_ancestors.nil? then
       @show_ancestors = Constants::DEFAULT_SHOW_ANCESTORS
     end
   end
@@ -548,10 +648,10 @@ class KanbanController < ApplicationController
   #
   def remove_user_without_issues
     copied_user_id_array = @user_id_array.dup
-    copied_user_id_array.each {|uid|
+    copied_user_id_array.each { |uid|
       number_of_issues = 0
-      @status_fields_array.each {|status_id|
-        @issues_hash[status_id].each {|issue|
+      @status_fields_array.each { |status_id|
+        @issues_hash[status_id].each { |issue|
           if issue.assigned_to_id == uid then
             number_of_issues += 1
           end
@@ -588,7 +688,7 @@ class KanbanController < ApplicationController
 
     unique_project_id_array << project_id
     subprojects = Project.where(parent_id: project_id)
-    subprojects.each {|subproject|
+    subprojects.each { |subproject|
       fill_subproject_ids(subproject.id.to_i, unique_project_id_array)
     }
   end

@@ -1,0 +1,122 @@
+<%#
+  View for the QuickTimeEntries plugin.  The page is divided into clearly
+  labelled sections: a summary of today’s logged time, a form to view past
+  hours, a filter section and the main log time form.  Each section is
+  wrapped in a .box element to follow Redmine’s styling conventions and
+  includes concise headings using translation keys.  Date inputs use
+  date_field_tag to render calendar pickers where supported.  All static
+  text is pulled through the I18n layer to facilitate localisation.
+%>
+
+<h2><%= h(l(:quick_time_entries_label_quick_time_entries)) %></h2>
+
+<!-- Today summary -->
+<div class="box">
+  <h3><%= l(:quick_time_entries_label_summary_today) %></h3>
+  <p>
+    <%= l(:quick_time_entries_label_spent_time) %>: <strong><%= @hours_today.to_f > 0 ? format_hours(@hours_today) : '0' %> <%= l(:quick_time_entries_label_hours) %></strong>
+    (<%= format_date(@today) %>)
+  </p>
+</div>
+
+<!-- Past hours summary -->
+<div class="box">
+  <h3><%= l(:quick_time_entries_label_view_past_hours) %></h3>
+  <%= form_tag({ :action => 'index' }, :method => :get, :class => 'summary-form') do %>
+    <p>
+      <label for="summary_date"><%= l(:quick_time_entries_field_spent_on) %>:</label>
+      <%= date_field_tag 'summary_date', (@summary_date || @today), :size => 10 %>
+      <%= hidden_field_tag 'project_id', @selected_project_id %>
+      <%= hidden_field_tag 'tracker_id', @selected_tracker_id %>
+      <%= hidden_field_tag 'due_date_start', @selected_due_date_start %>
+      <%= hidden_field_tag 'due_date_end', @selected_due_date_end %>
+      <%= submit_tag l(:quick_time_entries_button_apply), :name => nil, :class => 'button-small' %>
+    </p>
+  <% end %>
+  <% if @summary_date && @hours_summary %>
+    <p>
+      <%= l(:quick_time_entries_label_spent_time) %>: <strong><%= format_hours(@hours_summary) %> <%= l(:quick_time_entries_label_hours) %></strong>
+      (<%= format_date(@summary_date) %>)
+    </p>
+  <% end %>
+</div>
+
+<!-- Filters section -->
+<div class="box">
+  <h3><%= l(:quick_time_entries_label_filters) %></h3>
+  <%= form_tag({ :action => 'index' }, :method => :get, :class => 'filters-form') do %>
+    <p>
+      <label for="project_id"><%= l(:quick_time_entries_field_project) %>:</label>
+      <%= select_tag 'project_id', options_from_collection_for_select(@projects, 'id', 'name', @selected_project_id), :include_blank => true %>
+    </p>
+    <p>
+      <label for="tracker_id"><%= l(:quick_time_entries_field_tracker) %>:</label>
+      <%= select_tag 'tracker_id', options_from_collection_for_select(@trackers, 'id', 'name', @selected_tracker_id), :include_blank => true %>
+    </p>
+    <p>
+      <label for="due_date_start"><%= l(:quick_time_entries_label_due_date_from) %>:</label>
+      <%= date_field_tag 'due_date_start', @selected_due_date_start, :size => 10 %>
+    </p>
+    <p>
+      <label for="due_date_end"><%= l(:quick_time_entries_label_due_date_to) %>:</label>
+      <%= date_field_tag 'due_date_end', @selected_due_date_end, :size => 10 %>
+    </p>
+    <%= submit_tag l(:quick_time_entries_button_apply), :name => nil, :class => 'button-small' %>
+  <% end %>
+</div>
+
+<!-- Main log time section -->
+<div class="box">
+  <h3><%= l(:quick_time_entries_label_log_time_for_issues) %></h3>
+  <% if @issues.any? %>
+    <%= form_tag({ :action => 'create' }, :method => :post, :class => 'quick-time-form') do %>
+      <!-- Preserve current filter selections when submitting time entries -->
+      <%= hidden_field_tag 'project_id', @selected_project_id %>
+      <%= hidden_field_tag 'tracker_id', @selected_tracker_id %>
+      <%= hidden_field_tag 'due_date_start', @selected_due_date_start %>
+      <%= hidden_field_tag 'due_date_end', @selected_due_date_end %>
+      <table class="list issues quick-time-table">
+        <thead>
+          <tr>
+            <th><%= l(:quick_time_entries_field_id) %></th>
+            <th><%= l(:quick_time_entries_field_subject) %></th>
+            <th><%= l(:quick_time_entries_field_project) %></th>
+            <th><%= l(:quick_time_entries_field_estimated_hours) %></th>
+            <th><%= l(:quick_time_entries_label_spent_time) %></th>
+            <th><%= l(:quick_time_entries_label_remaining_time) %></th>
+            <th><%= l(:quick_time_entries_label_hours) %></th>
+            <th><%= l(:quick_time_entries_field_comments) %></th>
+            <th><%= l(:quick_time_entries_field_spent_on) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @issues.each do |issue| %>
+            <% remaining = (issue.estimated_hours.to_f - issue.spent_hours.to_f) if issue.estimated_hours %>
+            <tr class="<%= cycle('odd', 'even') %>">
+              <td class="id"><%= link_to issue.id, issue_path(issue) %></td>
+              <td class="subject"><%= link_to h(issue.subject), issue_path(issue) %></td>
+              <td class="project"><%= h(issue.project.name) %></td>
+              <td class="estimated"><%= format_hours(issue.estimated_hours) if issue.estimated_hours %></td>
+              <td class="spent"><%= format_hours(issue.spent_hours) %></td>
+              <td class="remaining"><%= format_hours(remaining) if issue.estimated_hours %></td>
+              <td class="hours-input">
+                <%= text_field_tag "time_entries[#{issue.id}][hours]", '', :size => 4, :autocomplete => 'off' %>
+              </td>
+              <td class="comments-input">
+                <%= text_field_tag "time_entries[#{issue.id}][comments]", '', :size => 15, :autocomplete => 'off' %>
+              </td>
+              <td class="date-input">
+                <%= date_field_tag "time_entries[#{issue.id}][spent_on]", @today, :size => 10 %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <p class="buttons">
+        <%= submit_tag l(:quick_time_entries_button_save), :class => 'button' %>
+      </p>
+    <% end %>
+  <% else %>
+    <p><%= l(:quick_time_entries_label_no_data) %></p>
+  <% end %>
+</div>

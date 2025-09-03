@@ -1,0 +1,74 @@
+<%= form_with url: leave_automator_path, local: true, id: 'leave_form' do %>
+  <div class="field">
+    <%= label_tag :reason, 'Lí do nghỉ' %><br>
+    <%= text_field_tag :reason, '', required: true %>
+  </div>
+
+  <div class="field">
+    <%= label_tag :start_date, 'Ngày bắt đầu' %><br>
+    <%= date_field_tag :start_date, nil, required: true %>
+  </div>
+
+  <div class="field">
+    <%= label_tag :end_date, 'Ngày kết thúc' %><br>
+    <%= date_field_tag :end_date, nil, required: true %>
+  </div>
+
+  <div class="field">
+    <%= label_tag :description, 'Dự án đang thực hiện + tiến độ (không bắt buộc)' %><br>
+    <%= text_area_tag :description, '', rows: 3 %>
+  </div>
+
+  <hr>
+  <div id="day-hours-container">
+    <!-- Danh sách các ngày sẽ được JS chèn vào đây -->
+  </div>
+
+  <div class="actions">
+    <%= submit_tag 'Log Leave' %>
+  </div>
+<% end %>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const startField = document.querySelector('#start_date');
+        const endField   = document.querySelector('#end_date');
+        const container  = document.querySelector('#day-hours-container');
+
+        function renderDaySelectors() {
+            const start = new Date(startField.value);
+            const end   = new Date(endField.value);
+            container.innerHTML = '';
+
+            if (isNaN(start) || isNaN(end) || end < start) {
+                container.innerHTML = '<p style="color:red">Vui lòng chọn khoảng ngày hợp lệ.</p>';
+                return;
+            }
+
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const yyyy = d.getFullYear();
+                const mm   = String(d.getMonth() + 1).padStart(2, '0');
+                const dd   = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${yyyy}-${mm}-${dd}`;
+
+                // Tạo dòng selector
+                const wrapper = document.createElement('div');
+                wrapper.className = 'day-selector';
+                wrapper.innerHTML = `
+          <label><strong>${dateStr}</strong>:</label>
+          <label><input type="radio" name="hours[${dateStr}]" value="8" checked> 8 h</label>
+          <label><input type="radio" name="hours[${dateStr}]" value="4"> 4 h</label>
+          <label><input type="radio" name="hours[${dateStr}]" value="2"> 2 h</label>
+        `;
+                container.appendChild(wrapper);
+            }
+        }
+
+        startField.addEventListener('change', renderDaySelectors);
+        endField.addEventListener('change', renderDaySelectors);
+
+        // Khởi tạo lần đầu
+        renderDaySelectors();
+    });
+</script>
