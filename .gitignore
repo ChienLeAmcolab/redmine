@@ -47,3 +47,8 @@
 yarn-error.log
 
 /config/master.key
+.history/
+vendor/
+storage/google_sheet
+config/credentials
+db_backup.sql
